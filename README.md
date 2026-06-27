@@ -5,6 +5,10 @@
 This project is the initial site creation for **CSE 340: Server-side Development**.  
 It demonstrates server-side fundamentals using **Node.js, Express, and EJS** templates, with deployment to **Render.com**.
 
+## 🚀 Live Deployment
+- Render URL: [https://cse340-course-8ntp.onrender.com](https://cse340-course-8ntp.onrender.com)
+- GitHub Repo: [https://github.com/havor13/cse340-course](https://github.com/havor13/cse340-course)
+
 ## Features
 - Node.js + Express server running locally and deployed to Render
 - EJS templates for:
