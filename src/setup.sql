@@ -1,34 +1,37 @@
+-- Reset existing tables
+DROP TABLE IF EXISTS project_category;
+DROP TABLE IF EXISTS projects;
+DROP TABLE IF EXISTS categories;
+DROP TABLE IF EXISTS organizations;
 
 -- Organizations table
 CREATE TABLE organizations (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(100) NOT NULL,
-  description TEXT
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description TEXT
 );
 
 -- Projects table
 CREATE TABLE projects (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(100) NOT NULL,
-  description TEXT,
-  organization_id INT NOT NULL,
-  FOREIGN KEY (organization_id) REFERENCES organizations(id)
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    organization_id INT REFERENCES organizations(id) ON DELETE CASCADE
 );
 
 -- Categories table
 CREATE TABLE categories (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(100) NOT NULL UNIQUE,
-  description TEXT
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) UNIQUE NOT NULL
 );
 
--- Join table (many-to-many between projects and categories)
+-- Join table for many-to-many relationship
 CREATE TABLE project_category (
-  project_id INT NOT NULL,
-  category_id INT NOT NULL,
-  PRIMARY KEY (project_id, category_id),
-  FOREIGN KEY (project_id) REFERENCES projects(id),
-  FOREIGN KEY (category_id) REFERENCES categories(id)
+    project_id INT NOT NULL,
+    category_id INT NOT NULL,
+    PRIMARY KEY (project_id, category_id),
+    FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
+    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
 );
 
 -- Insert organizations
@@ -44,14 +47,16 @@ INSERT INTO projects (name, description, organization_id) VALUES
 ('Health Fair', 'Offering free screenings and wellness education to the community.', 1);
 
 -- Insert categories
-INSERT INTO categories (name, description) VALUES
-('Environmental', 'Projects focused on sustainability and protecting natural resources.'),
-('Educational', 'Projects supporting learning, teaching, and academic growth.'),
-('Community Service', 'Projects strengthening communities through volunteer work and outreach.'),
-('Health and Wellness', 'Projects promoting physical, mental, and emotional well-being.');
+INSERT INTO categories (name) VALUES
+('Environmental'),
+('Educational'),
+('Community Service'),
+('Health and Wellness');
 
--- Link projects to categories
+-- Associate projects with categories
 INSERT INTO project_category (project_id, category_id) VALUES
+(1, 1), -- Community Clean-Up → Environmental
 (1, 3), -- Community Clean-Up → Community Service
 (2, 2), -- Literacy Program → Educational
-(3, 4); -- Health Fair → Health and Wellness
+(3, 4), -- Health Fair → Health and Wellness
+(3, 3); -- Health Fair → Community Service
