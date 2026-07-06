@@ -37,12 +37,12 @@ CREATE TABLE project_category (
 -- Seed organizations
 INSERT INTO organizations (name, description, contact_email, logo_filename)
 VALUES
-('Helping Hands', 'A nonprofit dedicated to organizing community service projects and volunteer opportunities.', 'contact@helpinghands.org', 'helpinghands-logo.png'),
-('Green Earth', 'An environmental group focused on sustainability, conservation, and eco-friendly initiatives.', 'info@greenearth.org', 'greenearth-logo.png'),
-('Bright Future', 'An educational charity supporting literacy programs and youth mentorship.', 'hello@brightfuture.org', 'brightfuture-logo.png'),
-('BrightFuture Builders', 'A nonprofit focused on improving community infrastructure through sustainable construction projects.', 'info@brightfuturebuilders.org', 'brightfuture-logo.png'),
-('GreenHarvest Growers', 'An urban farming collective promoting food sustainability and education in local neighborhoods.', 'contact@greenharvest.org', 'greenharvest-logo.png'),
-('UnityServe Volunteers', 'A volunteer coordination group supporting local charities and service initiatives.', 'hello@unityserve.org', 'unityserve-logo.png');
+('Helping Hands', 'A community group focused on local outreach and support.', 'contact@helpinghands.org', 'org1.png'),
+('Green Earth', 'Dedicated to environmental sustainability and conservation projects.', 'info@greenearth.org', 'org2.png'),
+('Bright Future', 'Focused on education and youth empowerment initiatives.', 'hello@brightfuture.org', 'org3.png'),
+('BrightFuture Builders', 'Improving community infrastructure through sustainable construction.', 'info@brightfuturebuilders.org', 'org4.png'),
+('GreenHarvest Growers', 'Urban farming collective promoting food sustainability.', 'contact@greenharvest.org', 'org5.png'),
+('UnityServe Volunteers', 'Volunteer coordination group supporting local charities.', 'hello@unityserve.org', 'org6.png');
 
 -- Seed categories
 INSERT INTO categories (name) VALUES
@@ -69,3 +69,18 @@ SELECT * FROM organizations;
 SELECT * FROM categories;
 SELECT * FROM projects;
 SELECT * FROM project_category;
+
+ALTER TABLE categories
+ADD COLUMN description TEXT;
+
+UPDATE categories SET description = 'Projects focused on sustainability and protecting natural resources.'
+WHERE name = 'Environment';
+
+UPDATE categories SET description = 'Projects supporting learning, teaching, and academic growth.'
+WHERE name = 'Education';
+
+UPDATE categories SET description = 'Projects strengthening communities through volunteer work and outreach.'
+WHERE name = 'Community Service';
+
+UPDATE categories SET description = 'Projects promoting physical, mental, and emotional well-being.'
+WHERE name = 'Health';
