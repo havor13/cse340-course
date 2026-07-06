@@ -1,3 +1,6 @@
+// server.js
+import { getAllOrganizations } from './src/models/organizations.js';
+import db, { testConnection } from './src/models/db.js';
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -5,35 +8,71 @@ import dotenv from 'dotenv';
 import helmet from 'helmet';
 import morgan from 'morgan';
 
+// Load environment variables
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const NODE_ENV = process.env.NODE_ENV || 'development';
 
 // Resolve __dirname in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Middleware
-app.use(helmet()); // Security headers
-app.use(morgan('dev')); // Logging
-app.use(express.json()); // Parse JSON bodies
-app.use(express.urlencoded({ extended: true })); // Parse form data
-app.use(express.static(path.join(__dirname, 'public'))); // Serve static files
+app.use(helmet());
+app.use(morgan('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // View engine
 app.set('view engine', 'ejs');
 
 // Routes
 app.get('/', (req, res) => res.render('home', { title: 'Home' }));
-app.get('/organizations', (req, res) => res.render('organizations', { title: 'Organizations' }));
-app.get('/projects', (req, res) => res.render('projects', { title: 'Projects' }));
-app.get('/categories', (req, res) => res.render('categories', { title: 'Categories' }));
 
-// Example POST route (for forms)
+// Organizations route using model function
+app.get('/organizations', async (req, res) => {
+  try {
+    const organizations = await getAllOrganizations();
+    console.log(organizations); // Debug: see rows in console
+
+    const title = 'Our Partner Organizations';
+    res.render('organizations', { title, organizations });
+  } catch (error) {
+    console.error('❌ Error fetching organizations:', error.message);
+    res.status(500).send('❌ Database error: ' + error.message);
+  }
+});
+
+app.get('/projects', (req, res) => res.render('projects', { title: 'Projects' }));
+
+// Categories route
+app.get('/categories', async (req, res) => {
+  try {
+    const result = await db.query('SELECT * FROM categories ORDER BY category_id');
+    res.render('categories', { title: 'Categories', categories: result.rows });
+  } catch (error) {
+    console.error('❌ Error fetching categories:', error.message);
+    res.status(500).send('❌ Database error: ' + error.message);
+  }
+});
+
 app.post('/submit', (req, res) => {
   const { name, email } = req.body;
   res.render('success', { title: 'Form Submitted', name, email });
+});
+
+// Safer DB test route
+app.get('/test-db', async (req, res) => {
+  try {
+    const result = await db.query('SELECT NOW() as current_time');
+    res.send('✅ Database connection successful: ' + result.rows[0].current_time);
+  } catch (error) {
+    console.error('❌ Database connection failed:', error.message);
+    res.status(500).send('❌ Database connection failed: ' + error.message);
+  }
 });
 
 // 404 handler
@@ -49,5 +88,7 @@ app.use((err, req, res, next) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`✅ Server running at http://localhost:${PORT}`);
+  console.log("🚀 Starting server...");
+  console.log(`📡 Listening on http://127.0.0.1:${PORT}`);
+  console.log(`🌍 Environment: ${NODE_ENV}`);
 });
