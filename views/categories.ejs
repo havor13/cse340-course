@@ -1,14 +1,24 @@
 <%- include('partials/header') %>
 
 <main>
-  <h1><%= title %></h1>
+  <h1>Categories</h1>
   <section class="card-grid">
-    <% categories.forEach(cat => { %>
-      <div class="card">
-        <h2><%= cat.name %></h2>
-        <p><%= cat.description %></p>
-      </div>
-    <% }) %>
+    <% if (categories && categories.length > 0) { %>
+      <% categories.forEach(category => { %>
+        <div class="card">
+          <h2>
+            <a href="/category/<%= category.category_id %>">
+              <%= category.name %>
+            </a>
+          </h2>
+          <% if (category.description) { %>
+            <p><%= category.description %></p>
+          <% } %>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <p>No categories found.</p>
+    <% } %>
   </section>
 </main>
 

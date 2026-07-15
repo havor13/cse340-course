@@ -5,10 +5,16 @@
   <section class="card-grid">
     <% organizations.forEach(org => { %>
       <div class="card">
-        <img src="/images/<%= org.logo_filename %>" alt="<%= org.name %> logo">
-        <h2><%= org.name %></h2>
+        <!-- Wrap logo + name in a link to the detail page -->
+        <a href="/organization/<%= org.organization_id %>" class="org-link">
+          <img src="/images/<%= org.logo_filename %>" alt="<%= org.name %> logo">
+          <h2><%= org.name %></h2>
+        </a>
         <p><%= org.description %></p>
-        <p><strong>Contact Email:</strong> <a href="mailto:<%= org.contact_email %>"><%= org.contact_email %></a></p>
+        <p>
+          <strong>Contact Email:</strong> 
+          <a href="mailto:<%= org.contact_email %>"><%= org.contact_email %></a>
+        </p>
       </div>
     <% }) %>
   </section>

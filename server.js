@@ -7,6 +7,9 @@ import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import categoryRoutes from './src/routes/categories.js';
+import projectRoutes from './src/routes/projects.js'; // ✅ add projects router
+import organizationRoutes from "./src/routes/organizations.js";
 
 // Load environment variables
 dotenv.config();
@@ -30,25 +33,26 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
 
 // Routes
+app.use('/category', categoryRoutes);
+app.use('/project', projectRoutes);   // ✅ detail routes
+app.use('/projects', projectRoutes);  // ✅ list routes
+app.use("/", organizationRoutes);
+
+
 app.get('/', (req, res) => res.render('home', { title: 'Home' }));
 
 // Organizations route using model function
 app.get('/organizations', async (req, res) => {
   try {
     const organizations = await getAllOrganizations();
-    console.log(organizations); // Debug: see rows in console
-
-    const title = 'Our Partner Organizations';
-    res.render('organizations', { title, organizations });
+    res.render('organizations', { title: 'Our Partner Organizations', organizations });
   } catch (error) {
     console.error('❌ Error fetching organizations:', error.message);
     res.status(500).send('❌ Database error: ' + error.message);
   }
 });
 
-app.get('/projects', (req, res) => res.render('projects', { title: 'Projects' }));
-
-// Categories route
+// Categories route (list all categories)
 app.get('/categories', async (req, res) => {
   try {
     const result = await db.query('SELECT * FROM categories ORDER BY category_id');

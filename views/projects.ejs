@@ -3,18 +3,29 @@
 <main>
   <h1><%= title %></h1>
   <section class="card-grid">
-    <div class="card">
-      <h2>Community Clean-Up</h2>
-      <p>Volunteers gather to clean public spaces and promote civic pride.</p>
-    </div>
-    <div class="card">
-      <h2>Literacy Program</h2>
-      <p>Providing books and tutoring to improve literacy in underserved areas.</p>
-    </div>
-    <div class="card">
-      <h2>Health Fair</h2>
-      <p>Offering free screenings and wellness education to the community.</p>
-    </div>
+    <% projects.forEach(project => { %>
+      <div class="card">
+        <!-- Project name links to detail page -->
+        <h2>
+          <a href="/project/<%= project.project_id %>">
+            <%= project.name %>
+          </a>
+        </h2>
+        <p><%= project.description %></p>
+
+        <!-- Optional: show category tags -->
+        <% if (project.categories && project.categories.length > 0) { %>
+          <p>
+            Categories:
+            <% project.categories.forEach(cat => { %>
+              <a href="/category/<%= cat.category_id %>" class="tag">
+                <%= cat.name %>
+              </a>
+            <% }) %>
+          </p>
+        <% } %>
+      </div>
+    <% }) %>
   </section>
 </main>
 
