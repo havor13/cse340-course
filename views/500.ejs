@@ -1,10 +1,20 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title><%= title %></title>
-</head>
-<body>
+<%- include('partials/header') %>
+
+<main>
   <h1>500 - Server Error</h1>
-  <p>Something went wrong on our end. Please try again later.</p>
-</body>
-</html>
+  <p>Oops! Something went wrong on our end.</p>
+
+  <% if (typeof error !== 'undefined' && error) { %>
+    <details>
+      <summary>Technical details</summary>
+      <pre><%= error.stack || error %></pre>
+    </details>
+  <% } %>
+
+  <p>
+    <a href="/" class="btn-small">← Back to Home</a>
+    <a href="/projects" class="btn-small">Browse Projects</a>
+  </p>
+</main>
+
+<%- include('partials/footer') %>

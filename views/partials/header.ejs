@@ -18,3 +18,14 @@
       <a href="/categories">Categories</a>
     </nav>
   </header>
+
+  <!-- Flash Messages -->
+  <% if (messages) { %>
+    <div class="flash-container">
+      <% Object.keys(messages).forEach(type => { %>
+        <% messages[type].forEach(msg => { %>
+          <p class="flash-<%= type %>"><%= msg %></p>
+        <% }) %>
+      <% }) %>
+    </div>
+  <% } %>

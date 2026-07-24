@@ -11,6 +11,13 @@
     <p><strong>Contact Email:</strong> 
       <a href="mailto:<%= organization.contact_email %>"><%= organization.contact_email %></a>
     </p>
+
+    <!-- Edit Organization Link -->
+    <p>
+      <a href="/edit-organization/<%= organization.organization_id %>" class="btn-small">
+        ✏️ Edit Organization
+      </a>
+    </p>
   </section>
 
   <section class="org-projects">

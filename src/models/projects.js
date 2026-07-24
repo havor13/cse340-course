@@ -85,3 +85,70 @@ export async function getProjectsByOrganizationId(organizationId) {
   );
   return result.rows;
 }
+
+// ✅ Create a new project
+export async function createProject(title, description, location, date, organizationId) {
+  const query = `
+    INSERT INTO projects (title, description, location, date, organization_id)
+    VALUES ($1, $2, $3, $4, $5)
+    RETURNING project_id;
+  `;
+  const params = [title, description, location, date, organizationId];
+  const result = await db.query(query, params);
+
+  if (result.rows.length === 0) {
+    throw new Error("Failed to create project");
+  }
+
+  if (process.env.ENABLE_SQL_LOGGING === "true") {
+    console.log("Created new project with ID:", result.rows[0].project_id);
+  }
+
+  return result.rows[0].project_id;
+}
+
+// ✅ Update an existing project
+export async function updateProject(projectId, title, description, location, date, organizationId) {
+  const query = `
+    UPDATE projects
+    SET title = $1,
+        description = $2,
+        location = $3,
+        date = $4,
+        organization_id = $5
+    WHERE project_id = $6
+    RETURNING project_id;
+  `;
+  const params = [title, description, location, date, organizationId, projectId];
+  const result = await db.query(query, params);
+
+  if (result.rows.length === 0) {
+    throw new Error("Failed to update project or project not found");
+  }
+
+  if (process.env.ENABLE_SQL_LOGGING === "true") {
+    console.log("Updated project with ID:", result.rows[0].project_id);
+  }
+
+  return result.rows[0].project_id;
+}
+
+// ✅ Delete a project
+export async function deleteProject(projectId) {
+  const query = `
+    DELETE FROM projects
+    WHERE project_id = $1
+    RETURNING project_id;
+  `;
+  const result = await db.query(query, [projectId]);
+
+  if (result.rows.length === 0) {
+    throw new Error("Failed to delete project or project not found");
+  }
+
+  if (process.env.ENABLE_SQL_LOGGING === "true") {
+    console.log("Deleted project with ID:", result.rows[0].project_id);
+  }
+
+  return result.rows[0].project_id;
+}

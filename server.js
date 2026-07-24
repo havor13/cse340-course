@@ -1,6 +1,6 @@
 // server.js
 import { getAllOrganizations } from './src/models/organizations.js';
-import db, { testConnection } from './src/models/db.js';
+import db from './src/models/db.js';
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -8,12 +8,16 @@ import dotenv from 'dotenv';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import categoryRoutes from './src/routes/categories.js';
-import projectRoutes from './src/routes/projects.js'; // ✅ add projects router
+import projectRoutes from './src/routes/projects.js';
 import organizationRoutes from "./src/routes/organizations.js";
+import session from "express-session";
+import flash from "connect-flash"; // ✅ use connect-flash
 
 // Load environment variables
 dotenv.config();
+const SESSION_SECRET = process.env.SESSION_SECRET;
 
+// Initialize app
 const app = express();
 const PORT = process.env.PORT || 3000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
@@ -22,7 +26,24 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Middleware
+// Session middleware (required for flash)
+app.use(session({
+  secret: SESSION_SECRET || "keyboard cat",
+  resave: false,
+  saveUninitialized: true,
+  cookie: { maxAge: 60 * 60 * 1000 } // 1 hour
+}));
+
+// Flash middleware
+app.use(flash());
+
+// Make flash messages available in all views
+app.use((req, res, next) => {
+  res.locals.messages = req.flash();
+  next();
+});
+
+// Security & logging middleware
 app.use(helmet());
 app.use(morgan('dev'));
 app.use(express.json());
@@ -31,24 +52,26 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // View engine
 app.set('view engine', 'ejs');
-
-// Routes
-app.use('/category', categoryRoutes);
-app.use('/project', projectRoutes);   // ✅ detail routes
-app.use('/projects', projectRoutes);  // ✅ list routes
-app.use("/", organizationRoutes);
+app.set('views', path.join(__dirname, 'views')); // ✅ point to correct folder
 
 
+// ✅ Routes
+app.use("/", categoryRoutes);     // categories routes
+app.use("/projects", projectRoutes);        // projects routes
+app.use("/", organizationRoutes); // organizations routes
+
+// Home route
 app.get('/', (req, res) => res.render('home', { title: 'Home' }));
 
-// Organizations route using model function
+// Organizations route
 app.get('/organizations', async (req, res) => {
   try {
     const organizations = await getAllOrganizations();
     res.render('organizations', { title: 'Our Partner Organizations', organizations });
   } catch (error) {
     console.error('❌ Error fetching organizations:', error.message);
-    res.status(500).send('❌ Database error: ' + error.message);
+    req.flash("error", "Failed to load organizations.");
+    res.redirect("/");
   }
 });
 
@@ -59,16 +82,18 @@ app.get('/categories', async (req, res) => {
     res.render('categories', { title: 'Categories', categories: result.rows });
   } catch (error) {
     console.error('❌ Error fetching categories:', error.message);
-    res.status(500).send('❌ Database error: ' + error.message);
+    req.flash("error", "Failed to load categories.");
+    res.redirect("/");
   }
 });
 
+// Example form submission route
 app.post('/submit', (req, res) => {
   const { name, email } = req.body;
   res.render('success', { title: 'Form Submitted', name, email });
 });
 
-// Safer DB test route
+// DB test route
 app.get('/test-db', async (req, res) => {
   try {
     const result = await db.query('SELECT NOW() as current_time');
@@ -87,6 +112,7 @@ app.use((req, res) => {
 // Global error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
+  req.flash("error", "Server error occurred.");
   res.status(500).render('500', { title: 'Server Error' });
 });
 

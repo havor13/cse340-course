@@ -1,0 +1,32 @@
+<%- include('partials/header') %>
+
+<main>
+  <h1>Edit Category</h1>
+
+  <form action="/edit-category/<%= category.category_id %>" method="POST">
+    <label for="name">Category Name</label>
+    <input 
+      type="text" 
+      id="name" 
+      name="name" 
+      value="<%= category.name %>" 
+      maxlength="100" 
+      required
+    >
+
+    <!-- Show server-side validation errors -->
+    <% if (errors && errors.length > 0) { %>
+      <ul class="error-list">
+        <% errors.forEach(error => { %>
+          <li><%= error.msg %></li> <!-- ✅ use .msg -->
+        <% }) %>
+      </ul>
+    <% } %>
+
+    <button type="submit">Update Category</button>
+  </form>
+
+  <p><a href="/categories">← Back to Categories</a></p>
+</main>
+
+<%- include('partials/footer') %>

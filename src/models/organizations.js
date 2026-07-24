@@ -1,7 +1,8 @@
-import db from './db.js';
+// src/models/organizations.js
+import db from "./db.js";
 
 // Get all organizations
-const getAllOrganizations = async () => {
+export async function getAllOrganizations() {
   const query = `
     SELECT organization_id, name, description, contact_email, logo_filename
     FROM public.organizations
@@ -9,20 +10,38 @@ const getAllOrganizations = async () => {
   `;
   const result = await db.query(query);
   return result.rows;
-};
+}
 
 // Get a single organization by ID
-const getOrganizationById = async (id) => {
+export async function getOrganizationById(id) {
   const query = `
     SELECT organization_id, name, description, contact_email, logo_filename
     FROM public.organizations
     WHERE organization_id = $1;
   `;
   const result = await db.query(query, [id]);
-  return result.rows[0]; // return one row
-};
+  return result.rows[0];
+}
 
-export {
-  getAllOrganizations,
-  getOrganizationById
-};
+// ✅ Create a new organization
+export async function createOrganization(name, description, contactEmail, logoFilename) {
+  const query = `
+    INSERT INTO public.organizations (name, description, contact_email, logo_filename)
+    VALUES ($1, $2, $3, $4)
+    RETURNING organization_id, name, description, contact_email, logo_filename;
+  `;
+  const result = await db.query(query, [name, description, contactEmail, logoFilename]);
+  return result.rows[0];
+}
+
+// ✅ Update an existing organization
+export async function updateOrganization(id, name, description, contactEmail) {
+  const query = `
+    UPDATE public.organizations
+    SET name = $1, description = $2, contact_email = $3
+    WHERE organization_id = $4
+    RETURNING organization_id, name, description, contact_email, logo_filename;
+  `;
+  const result = await db.query(query, [name, description, contactEmail, id]);
+  return result.rows[0];
+}

@@ -6,38 +6,49 @@ DROP TABLE IF EXISTS organizations;
 
 -- Organizations
 CREATE TABLE organizations (
-  organization_id SERIAL PRIMARY KEY,
+  organization_id SERIAL,
   name VARCHAR(150) NOT NULL,
   description TEXT NOT NULL,
-  contact_email VARCHAR(255) UNIQUE NOT NULL,
-  logo_filename VARCHAR(255) NOT NULL
+  contact_email VARCHAR(255) NOT NULL,
+  logo_filename VARCHAR(255) NOT NULL,
+  CONSTRAINT pk_organizations PRIMARY KEY (organization_id),
+  CONSTRAINT uq_org_email UNIQUE (contact_email)
 );
 
 -- Categories
 CREATE TABLE categories (
-  category_id SERIAL PRIMARY KEY,
-  name VARCHAR(100) UNIQUE NOT NULL,
-  description TEXT NOT NULL
+  category_id SERIAL,
+  name VARCHAR(100) NOT NULL,
+  description TEXT NOT NULL,
+  CONSTRAINT pk_categories PRIMARY KEY (category_id),
+  CONSTRAINT uq_category_name UNIQUE (name)
 );
 
 -- Projects
 CREATE TABLE projects (
-  project_id SERIAL PRIMARY KEY,
+  project_id SERIAL,
   organization_id INT NOT NULL,
   name VARCHAR(150) NOT NULL,
   description TEXT NOT NULL,
   project_date DATE NOT NULL,
   location VARCHAR(150) NOT NULL,
-  FOREIGN KEY (organization_id) REFERENCES organizations(organization_id) ON DELETE CASCADE
+  CONSTRAINT pk_projects PRIMARY KEY (project_id),
+  CONSTRAINT fk_projects_org FOREIGN KEY (organization_id)
+    REFERENCES organizations(organization_id)
+    ON DELETE CASCADE
 );
 
 -- Many-to-many relationship between projects and categories
 CREATE TABLE project_category (
   project_id INT NOT NULL,
   category_id INT NOT NULL,
-  PRIMARY KEY (project_id, category_id),
-  FOREIGN KEY (project_id) REFERENCES projects(project_id) ON DELETE CASCADE,
-  FOREIGN KEY (category_id) REFERENCES categories(category_id) ON DELETE CASCADE
+  CONSTRAINT pk_project_category PRIMARY KEY (project_id, category_id),
+  CONSTRAINT fk_project FOREIGN KEY (project_id)
+    REFERENCES projects(project_id)
+    ON DELETE CASCADE,
+  CONSTRAINT fk_category FOREIGN KEY (category_id)
+    REFERENCES categories(category_id)
+    ON DELETE CASCADE
 );
 
 -- Seed organizations (15 total)

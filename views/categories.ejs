@@ -2,6 +2,20 @@
 
 <main>
   <h1>Categories</h1>
+
+  <!-- Flash messages -->
+  <% if (messages && messages.success) { %>
+    <p class="flash-success"><%= messages.success %></p>
+  <% } %>
+  <% if (messages && messages.error) { %>
+    <p class="flash-error"><%= messages.error %></p>
+  <% } %>
+
+  <!-- Link to create new category -->
+  <p>
+    <a href="/new-category" class="btn">+ Add New Category</a>
+  </p>
+
   <section class="card-grid">
     <% if (categories && categories.length > 0) { %>
       <% categories.forEach(category => { %>
@@ -11,9 +25,17 @@
               <%= category.name %>
             </a>
           </h2>
+
           <% if (category.description) { %>
             <p><%= category.description %></p>
           <% } %>
+
+          <!-- Edit link -->
+          <p>
+            <a href="/edit-category/<%= category.category_id %>" class="btn-small">
+              Edit
+            </a>
+          </p>
         </div>
       <% }) %>
     <% } else { %>

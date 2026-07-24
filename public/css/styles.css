@@ -116,3 +116,124 @@ footer {
     max-width: 90px;  /* phone size */
   }
 }
+
+/* Buttons */
+.btn {
+  display: inline-block;
+  padding: 0.6em 1.2em;
+  background-color: #0078d4; /* Microsoft blue */
+  color: #fff;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: 600;
+  transition: background-color 0.2s ease;
+}
+
+.btn:hover {
+  background-color: #005a9e;
+}
+
+.btn-small {
+  display: inline-block;
+  padding: 0.4em 0.8em;
+  background-color: #e0e0e0;
+  color: #333;
+  text-decoration: none;
+  border-radius: 3px;
+  font-size: 0.9em;
+  transition: background-color 0.2s ease;
+}
+
+.btn-small:hover {
+  background-color: #c7c7c7;
+}
+
+/* Error messages */
+.error-list {
+  margin: 1em 0;
+  padding: 0.8em;
+  background-color: #fdecea;
+  border: 1px solid #f5c2c0;
+  border-radius: 4px;
+  color: #b71c1c;
+  list-style-type: disc;
+  list-style-position: inside;
+}
+
+/* Flash messages */
+.flash-success {
+  margin: 1em 0;
+  padding: 0.8em;
+  background-color: #e6f4ea;
+  border: 1px solid #a5d6a7;
+  border-radius: 4px;
+  color: #2e7d32;
+}
+
+.flash-error {
+  margin: 1em 0;
+  padding: 0.8em;
+  background-color: #fdecea;
+  border: 1px solid #f5c2c0;
+  border-radius: 4px;
+  color: #b71c1c;
+}
+
+/* Form styling */
+form {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.form-group {
+  margin-bottom: 1.2em;
+}
+
+label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.4em;
+}
+
+input[type="text"],
+input[type="email"],
+textarea {
+  width: 100%;
+  padding: 0.6em;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font: inherit;
+}
+
+textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* Flash message styles */
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
+.alert.success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+.alert.error {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+.alert.warning {
+    color: #856404;
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+}
+.alert.info {
+    color: #0c5460;
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+}

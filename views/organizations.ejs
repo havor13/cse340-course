@@ -2,21 +2,46 @@
 
 <main>
   <h1><%= title %></h1>
+
+  <!-- Flash messages -->
+  <% if (messages && messages.success) { %>
+    <p class="flash-success"><%= messages.success %></p>
+  <% } %>
+  <% if (messages && messages.error) { %>
+    <p class="flash-error"><%= messages.error %></p>
+  <% } %>
+
+  <!-- Link to create new organization -->
+  <p>
+    <a href="/new-organization" class="btn">+ Add New Organization</a>
+  </p>
+
   <section class="card-grid">
-    <% organizations.forEach(org => { %>
-      <div class="card">
-        <!-- Wrap logo + name in a link to the detail page -->
-        <a href="/organization/<%= org.organization_id %>" class="org-link">
-          <img src="/images/<%= org.logo_filename %>" alt="<%= org.name %> logo">
-          <h2><%= org.name %></h2>
-        </a>
-        <p><%= org.description %></p>
-        <p>
-          <strong>Contact Email:</strong> 
-          <a href="mailto:<%= org.contact_email %>"><%= org.contact_email %></a>
-        </p>
-      </div>
-    <% }) %>
+    <% if (organizations && organizations.length > 0) { %>
+      <% organizations.forEach(org => { %>
+        <div class="card">
+          <!-- Wrap logo + name in a link to the detail page -->
+          <a href="/organization/<%= org.organization_id %>" class="org-link">
+            <img src="/images/<%= org.logo_filename %>" alt="<%= org.name %> logo">
+            <h2><%= org.name %></h2>
+          </a>
+          <p><%= org.description %></p>
+          <p>
+            <strong>Contact Email:</strong> 
+            <a href="mailto:<%= org.contact_email %>"><%= org.contact_email %></a>
+          </p>
+
+          <!-- Edit link -->
+          <p>
+            <a href="/edit-organization/<%= org.organization_id %>" class="btn-small">
+              ✏️ Edit
+            </a>
+          </p>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <p>No organizations found.</p>
+    <% } %>
   </section>
 </main>
 

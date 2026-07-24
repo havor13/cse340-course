@@ -2,9 +2,21 @@
 
 <main>
   <% if (category) { %>
+    <!-- Category Details -->
     <h1><%= category.name %></h1>
     <p><%= category.description %></p>
 
+    <!-- Navigation Links -->
+    <p>
+      <a href="/edit-category/<%= category.category_id %>" class="btn-small">
+        ✏️ Edit Category
+      </a>
+      <a href="/categories" class="btn-small">
+        ← Back to Categories
+      </a>
+    </p>
+
+    <!-- Projects in this Category -->
     <h2>Projects in this Category:</h2>
     <section class="card-grid">
       <% if (projects && projects.length > 0) { %>
@@ -29,6 +41,7 @@
       <% } %>
     </section>
   <% } else { %>
+    <!-- Fallback if category not found -->
     <h1>Category not found</h1>
     <p>Please check the link or return to the categories list.</p>
   <% } %>

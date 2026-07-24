@@ -2,28 +2,47 @@
 
 <main>
   <h1><%= title %></h1>
+
+  <!-- Add Project button -->
+  <p><a href="/projects/new-project" class="btn-small">+ Add a New Service Project</a></p>
+
   <section class="card-grid">
     <% projects.forEach(project => { %>
       <div class="card">
-        <!-- Project name links to detail page -->
+        <!-- Project title links to detail page -->
         <h2>
-          <a href="/project/<%= project.project_id %>">
-            <%= project.name %>
+          <a href="/projects/<%= project.project_id %>">
+            <%= project.title %>
           </a>
         </h2>
         <p><%= project.description %></p>
+
+        <p><strong>Location:</strong> <%= project.location %></p>
+        <p><strong>Date:</strong> <%= project.date %></p>
+
+        <p>
+          <strong>Organization:</strong>
+          <a href="/organizations/<%= project.organization_id %>">
+            <%= project.organization_name %>
+          </a>
+        </p>
 
         <!-- Optional: show category tags -->
         <% if (project.categories && project.categories.length > 0) { %>
           <p>
             Categories:
             <% project.categories.forEach(cat => { %>
-              <a href="/category/<%= cat.category_id %>" class="tag">
+              <a href="/categories/<%= cat.category_id %>" class="tag">
                 <%= cat.name %>
               </a>
             <% }) %>
           </p>
         <% } %>
+
+        <!-- Edit button -->
+        <p>
+          <a href="/projects/edit-project/<%= project.project_id %>" class="btn-small">Edit</a>
+        </p>
       </div>
     <% }) %>
   </section>
