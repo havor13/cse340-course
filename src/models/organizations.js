@@ -23,7 +23,7 @@ export async function getOrganizationById(id) {
   return result.rows[0];
 }
 
-// ✅ Create a new organization
+// ✅ Create a new organization with error check
 export async function createOrganization(name, description, contactEmail, logoFilename) {
   const query = `
     INSERT INTO public.organizations (name, description, contact_email, logo_filename)
@@ -31,17 +31,27 @@ export async function createOrganization(name, description, contactEmail, logoFi
     RETURNING organization_id, name, description, contact_email, logo_filename;
   `;
   const result = await db.query(query, [name, description, contactEmail, logoFilename]);
+
+  if (result.rows.length === 0) {
+    throw new Error("Failed to create organization");
+  }
+
   return result.rows[0];
 }
 
-// ✅ Update an existing organization
-export async function updateOrganization(id, name, description, contactEmail) {
+// ✅ Update an existing organization with error check
+export async function updateOrganization(id, name, description, contactEmail, logoFilename) {
   const query = `
     UPDATE public.organizations
-    SET name = $1, description = $2, contact_email = $3
-    WHERE organization_id = $4
+    SET name = $1, description = $2, contact_email = $3, logo_filename = $4
+    WHERE organization_id = $5
     RETURNING organization_id, name, description, contact_email, logo_filename;
   `;
-  const result = await db.query(query, [name, description, contactEmail, id]);
+  const result = await db.query(query, [name, description, contactEmail, logoFilename, id]);
+
+  if (result.rows.length === 0) {
+    throw new Error("Failed to update organization");
+  }
+
   return result.rows[0];
 }

@@ -26,6 +26,12 @@
             </a>
           </h2>
 
+          <% if (category.image_url) { %>
+            <div class="thumbnail">
+              <img src="<%= category.image_url %>" alt="Category image" style="max-width:150px;">
+            </div>
+          <% } %>
+
           <% if (category.description) { %>
             <p><%= category.description %></p>
           <% } %>

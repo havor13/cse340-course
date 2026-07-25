@@ -6,6 +6,12 @@
     <h1><%= category.name %></h1>
     <p><%= category.description %></p>
 
+    <% if (category.image_url) { %>
+      <div class="category-image">
+        <img src="<%= category.image_url %>" alt="Category image" style="max-width:300px;">
+      </div>
+    <% } %>
+
     <!-- Navigation Links -->
     <p>
       <a href="/edit-category/<%= category.category_id %>" class="btn-small">
@@ -24,7 +30,7 @@
           <div class="card">
             <h3>
               <a href="/project/<%= project.project_id %>">
-                <%= project.name %>
+                <%= project.title %>
               </a>
             </h3>
             <p><%= project.description %></p>

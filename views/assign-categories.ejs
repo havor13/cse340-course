@@ -1,0 +1,58 @@
+<%- include('partials/header') %>
+
+<main>
+  <h1>Assign Categories</h1>
+
+  <!-- Show project title -->
+  <% if (project) { %>
+    <p><strong>Project:</strong> <%= project.title %></p>
+  <% } else { %>
+    <p class="error">Project not found.</p>
+  <% } %>
+
+  <!-- Flash messages -->
+  <% if (messages && messages.success) { %>
+    <p class="flash-success"><%= messages.success %></p>
+  <% } %>
+  <% if (messages && messages.error) { %>
+    <p class="flash-error"><%= messages.error %></p>
+  <% } %>
+
+  <!-- Assign categories form -->
+  <form action="/projects/<%= project.project_id %>/assign-categories" method="POST">
+    <div class="form-group">
+      <% if (Array.isArray(categories) && categories.length > 0) { %>
+        <% categories.forEach(category => { %>
+          <div class="checkbox-item">
+            <input
+              type="checkbox"
+              id="category-<%= category.category_id %>"
+              name="categoryIds"
+              value="<%= category.category_id %>"
+              <%= (assignedCategories && assignedCategories.some(ac => ac.category_id === category.category_id)) ? 'checked' : '' %>
+            />
+            <label for="category-<%= category.category_id %>"><%= category.name %></label>
+          </div>
+        <% }) %>
+      <% } else { %>
+        <p>No categories available.</p>
+      <% } %>
+    </div>
+
+    <!-- Show server-side validation errors -->
+    <% if (errors && errors.length > 0) { %>
+      <ul class="error-list">
+        <% errors.forEach(error => { %>
+          <li><%= error.msg %></li>
+        <% }) %>
+      </ul>
+    <% } %>
+
+    <button type="submit">Update Categories</button>
+  </form>
+
+  <!-- Navigation -->
+  <p><a href="/projects/<%= project.project_id %>">← Back to Project</a></p>
+</main>
+
+<%- include('partials/footer') %>

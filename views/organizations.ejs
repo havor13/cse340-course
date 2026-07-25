@@ -1,3 +1,4 @@
+
 <%- include('partials/header') %>
 
 <main>
@@ -8,7 +9,17 @@
     <p class="flash-success"><%= messages.success %></p>
   <% } %>
   <% if (messages && messages.error) { %>
-    <p class="flash-error"><%= messages.error %></p>
+    <div class="flash-error">
+      <% if (Array.isArray(messages.error)) { %>
+        <ul>
+          <% messages.error.forEach(function(msg) { %>
+            <li><%= msg %></li>
+          <% }) %>
+        </ul>
+      <% } else { %>
+        <p><%= messages.error %></p>
+      <% } %>
+    </div>
   <% } %>
 
   <!-- Link to create new organization -->
@@ -22,7 +33,11 @@
         <div class="card">
           <!-- Wrap logo + name in a link to the detail page -->
           <a href="/organization/<%= org.organization_id %>" class="org-link">
-            <img src="/images/<%= org.logo_filename %>" alt="<%= org.name %> logo">
+            <img 
+              src="/images/<%= org.logo_filename || 'placeholder-logo.png' %>" 
+              alt="<%= org.name ? org.name + ' logo' : 'Organization logo' %>"
+              style="max-width:150px;"
+            >
             <h2><%= org.name %></h2>
           </a>
           <p><%= org.description %></p>

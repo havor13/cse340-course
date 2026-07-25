@@ -1,6 +1,7 @@
 import { body, validationResult } from "express-validator";
 import * as projectModel from "../models/projects.js";
 import { getAllOrganizations } from "../models/organizations.js";
+import { getAllCategories, getCategoriesByProjectId, updateProjectCategories } from "../models/categories.js";
 
 // ----------------------
 // Validation rules
@@ -18,7 +19,7 @@ const projectValidation = [
     .trim()
     .notEmpty().withMessage("Location is required")
     .isLength({ max: 200 }).withMessage("Location must be less than 200 characters"),
-  body("date")
+  body("project_date")
     .notEmpty().withMessage("Date is required")
     .isISO8601().withMessage("Date must be a valid date format"),
   body("organizationId")
@@ -42,7 +43,7 @@ async function projectDetail(req, res) {
     }
 
     res.render("project", {
-      title: project.title || project.name,
+      title: project.title,
       project,
       categories: project.categories
     });
@@ -74,7 +75,7 @@ async function showNewProjectForm(req, res) {
     res.render("new-project", { 
       title: "New Project", 
       organizations, 
-      errors: null, 
+      errors: [], 
       old: {} 
     });
   } catch (err) {
@@ -88,7 +89,7 @@ async function showNewProjectForm(req, res) {
 // ----------------------
 async function processNewProjectForm(req, res) {
   const errors = validationResult(req);
-  const { title, description, location, date, organizationId } = req.body;
+  const { title, description, location, project_date, organizationId } = req.body;
 
   if (!errors.isEmpty()) {
     const organizations = await getAllOrganizations();
@@ -105,7 +106,7 @@ async function processNewProjectForm(req, res) {
       title,
       description,
       location,
-      date,
+      project_date,
       parseInt(organizationId, 10)
     );
     req.flash("success", "Project created successfully!");
@@ -130,16 +131,16 @@ async function showEditProjectForm(req, res) {
       return res.status(404).render("404", { title: "Not Found", message: "Project not found" });
     }
 
-    // Ensure date is formatted for input[type=date]
-    if (project.date instanceof Date) {
-      project.date = project.date.toISOString().split("T")[0];
+    // Ensure project_date is formatted for input[type=date]
+    if (project.project_date instanceof Date) {
+      project.project_date = project.project_date.toISOString().split("T")[0];
     }
 
     res.render("edit-project", { 
       title: "Edit Project", 
       project, 
       organizations, 
-      errors: null, 
+      errors: [], 
       old: {} 
     });
   } catch (err) {
@@ -151,9 +152,9 @@ async function showEditProjectForm(req, res) {
 // ----------------------
 // Process edit project form
 // ----------------------
-async function updateProject(req, res) {
+async function processEditProjectForm(req, res) {
   const errors = validationResult(req);
-  const { title, description, location, date, organizationId } = req.body;
+  const { title, description, location, project_date, organizationId } = req.body;
 
   if (!errors.isEmpty()) {
     const organizations = await getAllOrganizations();
@@ -173,7 +174,7 @@ async function updateProject(req, res) {
       title,
       description,
       location,
-      date,
+      project_date,
       parseInt(organizationId, 10)
     );
     req.flash("success", "Project updated successfully!");
@@ -202,6 +203,51 @@ async function deleteProject(req, res) {
 }
 
 // ----------------------
+// Assign categories
+// ----------------------
+async function showAssignCategoriesForm(req, res) {
+  try {
+    const projectId = parseInt(req.params.id, 10);
+    const project = await projectModel.getProjectById(projectId);
+    const categories = await getAllCategories();
+    const assignedCategories = await getCategoriesByProjectId(projectId);
+
+    if (!project) {
+      return res.status(404).render("404", { title: "Not Found", message: "Project not found" });
+    }
+
+    res.render("assign-categories", {
+      title: "Assign Categories",
+      project,
+      categories,
+      assignedCategories,
+      errors: [] // ✅ always defined
+    });
+  } catch (err) {
+    console.error("❌ Error loading assign categories form:", err);
+    res.status(500).render("500", { title: "Server Error", error: err });
+  }
+}
+
+async function processAssignCategoriesForm(req, res) {
+  try {
+    const projectId = parseInt(req.params.id, 10);
+    const categoryIds = Array.isArray(req.body.categoryIds)
+      ? req.body.categoryIds.map(id => parseInt(id, 10))
+      : [];
+
+    await updateProjectCategories(projectId, categoryIds);
+
+    req.flash("success", "Categories updated successfully!");
+    res.redirect(`/projects/${projectId}`);
+  } catch (err) {
+    console.error("❌ Error updating categories:", err);
+    req.flash("error", "Failed to update categories.");
+    res.redirect(`/projects/${req.params.id}`);
+  }
+}
+
+// ----------------------
 // Export
 // ----------------------
 export default {
@@ -210,8 +256,10 @@ export default {
   showNewProjectForm,
   processNewProjectForm,
   showEditProjectForm,
-  updateProject,
-  deleteProject
+  processEditProjectForm,
+  deleteProject,
+  showAssignCategoriesForm,
+  processAssignCategoriesForm
 };
 
 export { projectValidation };

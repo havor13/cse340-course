@@ -3,24 +3,43 @@
 <main>
   <h1><%= title %></h1>
 
-  <!-- Flash error messages -->
-  <% if (messages && messages.error && messages.error.length > 0) { %>
+  <!-- Flash messages -->
+  <% if (messages && messages.success) { %>
+    <p class="flash-success"><%= messages.success %></p>
+  <% } %>
+  <% if (messages && messages.error) { %>
+    <div class="flash-error">
+      <% if (Array.isArray(messages.error)) { %>
+        <ul>
+          <% messages.error.forEach(function(msg) { %>
+            <li><%= msg %></li>
+          <% }) %>
+        </ul>
+      <% } else { %>
+        <p><%= messages.error %></p>
+      <% } %>
+    </div>
+  <% } %>
+
+  <!-- Error messages -->
+  <% if (errors && errors.length > 0) { %>
     <div class="error-messages">
       <ul>
-        <% messages.error.forEach(function(msg) { %>
-          <li><%= msg %></li>
+        <% errors.forEach(error => { %>
+          <li><%= error.msg ? error.msg : error %></li>
         <% }) %>
       </ul>
     </div>
   <% } %>
 
-  <!-- Flash success message -->
+  <!-- Success message -->
   <% if (messages && messages.success && messages.success.length > 0) { %>
     <div class="success-message">
       <%= messages.success[0] %>
     </div>
   <% } %>
 
+  <!-- Edit Organization form -->
   <form action="/edit-organization/<%= organization.organization_id %>" method="POST">
     <div class="form-group">
       <label for="name">Organization Name</label>
@@ -28,7 +47,7 @@
         type="text" 
         id="name" 
         name="name" 
-        value="<%= organization.name %>" 
+        value="<%= oldInput && oldInput.name ? oldInput.name : organization.name %>" 
         maxlength="150" 
         required
       >
@@ -41,7 +60,7 @@
         name="description" 
         maxlength="500" 
         required
-      ><%= organization.description %></textarea>
+      ><%= oldInput && oldInput.description ? oldInput.description : organization.description %></textarea>
     </div>
 
     <div class="form-group">
@@ -50,24 +69,35 @@
         type="email" 
         id="contactEmail" 
         name="contactEmail" 
-        value="<%= organization.contact_email %>" 
+        value="<%= oldInput && oldInput.contactEmail ? oldInput.contactEmail : organization.contact_email %>" 
         maxlength="255" 
         required
       >
     </div>
 
-    <!-- Server-side validation errors (if passed directly as 'errors') -->
-    <% if (errors && errors.length > 0) { %>
-      <ul class="error-list">
-        <% errors.forEach(error => { %>
-          <li><%= error.msg ? error.msg : error %></li>
-        <% }) %>
-      </ul>
+    <!-- ✅ Image URL field -->
+    <div class="form-group">
+      <label for="logo_filename">Image URL</label>
+      <input 
+        type="text" 
+        id="logo_filename" 
+        name="logo_filename" 
+        value="<%= oldInput && oldInput.logo_filename ? oldInput.logo_filename : (organization.logo_filename || '') %>" 
+        placeholder="https://example.com/logo.png"
+      >
+    </div>
+
+    <% if (organization.logo_filename) { %>
+      <div class="image-preview">
+        <p>Current Image:</p>
+        <img src="<%= organization.logo_filename %>" alt="Organization logo" style="max-width:200px;">
+      </div>
     <% } %>
 
     <button type="submit">Update Organization</button>
   </form>
 
+  <!-- Navigation -->
   <p><a href="/organizations">← Back to all organizations</a></p>
 </main>
 

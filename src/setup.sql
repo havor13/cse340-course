@@ -28,7 +28,7 @@ CREATE TABLE categories (
 CREATE TABLE projects (
   project_id SERIAL,
   organization_id INT NOT NULL,
-  name VARCHAR(150) NOT NULL,
+  title VARCHAR(150) NOT NULL,
   description TEXT NOT NULL,
   project_date DATE NOT NULL,
   location VARCHAR(150) NOT NULL,
@@ -77,7 +77,7 @@ INSERT INTO categories (name, description) VALUES
 ('Environment', 'Sustainability and conservation projects.');
 
 -- Seed projects (with date + location)
-INSERT INTO projects (organization_id, name, description, project_date, location) VALUES
+INSERT INTO projects (organization_id, title, description, project_date, location) VALUES
 (1, 'Community Clean-Up', 'Neighborhood cleanup and beautification.', '2026-05-01', 'Accra'),
 (2, 'Tree Planting Drive', 'Planting 500 trees in local parks.', '2026-06-15', 'Kumasi'),
 (3, 'Literacy Program', 'Tutoring and reading support for children.', '2026-07-10', 'Cape Coast'),

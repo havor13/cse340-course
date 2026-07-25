@@ -4,22 +4,30 @@ import organizationController, { organizationValidation } from "../controllers/o
 
 const router = express.Router();
 
-// List all organizations
+// ✅ List all organizations
 router.get("/organizations", organizationController.listOrganizations);
 
-// Organization detail page
+// ✅ Organization detail page
 router.get("/organization/:id", organizationController.organizationDetail);
 
-// Show new organization form
+// ✅ Show new organization form
 router.get("/new-organization", organizationController.showNewOrganizationForm);
 
-// Handle new organization form submission with validation middleware
-router.post("/new-organization", organizationValidation, organizationController.processNewOrganizationForm);
+// ✅ Handle new organization form submission (with validation middleware)
+router.post(
+  "/new-organization",
+  organizationValidation,
+  organizationController.processNewOrganizationForm
+);
 
-// Show edit organization form
+// ✅ Show edit organization form
 router.get("/edit-organization/:id", organizationController.showEditOrganizationForm);
 
-// Handle edit organization form submission with validation middleware
-router.post("/edit-organization/:id", organizationValidation, organizationController.updateOrganization);
+// ✅ Handle edit organization form submission (with validation middleware)
+router.post(
+  "/edit-organization/:id",
+  organizationValidation,
+  organizationController.updateOrganization
+);
 
 export default router;

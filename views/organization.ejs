@@ -1,43 +1,54 @@
 <%- include('partials/header') %>
 
 <main>
-  <h1><%= organization.name %></h1>
+  <% if (organization) { %>
+    <!-- Organization Details -->
+    <h1><%= organization.name %></h1>
 
-  <section class="org-details">
-    <% if (organization.logo_filename) { %>
-      <img src="/images/<%= organization.logo_filename %>" alt="<%= organization.name %> logo">
-    <% } %>
-    <p><%= organization.description %></p>
-    <p><strong>Contact Email:</strong> 
-      <a href="mailto:<%= organization.contact_email %>"><%= organization.contact_email %></a>
-    </p>
+    <section class="org-details">
+      <% if (organization.logo_filename) { %>
+        <img 
+          src="/images/<%= organization.logo_filename || 'placeholder-logo.png' %>" 
+          alt="<%= organization.name ? organization.name + ' logo' : 'Organization logo' %>"
+          style="max-width:200px;"
+        >
+      <% } %>
+      <p><%= organization.description %></p>
+      <p><strong>Contact Email:</strong> 
+        <a href="mailto:<%= organization.contact_email %>"><%= organization.contact_email %></a>
+      </p>
 
-    <!-- Edit Organization Link -->
-    <p>
-      <a href="/edit-organization/<%= organization.organization_id %>" class="btn-small">
-        ✏️ Edit Organization
-      </a>
-    </p>
-  </section>
+      <!-- Edit Organization Link -->
+      <p>
+        <a href="/edit-organization/<%= organization.organization_id %>" class="btn-small">
+          ✏️ Edit Organization
+        </a>
+      </p>
+    </section>
 
-  <section class="org-projects">
-    <h2>Service Projects</h2>
-    <% if (projects && projects.length > 0) { %>
-      <ul>
-        <% projects.forEach(project => { %>
-          <li>
-            <!-- Accessible link to project detail page -->
-            <a href="/project/<%= project.project_id %>"><%= project.name %></a>
-          </li>
-        <% }) %>
-      </ul>
-    <% } else { %>
-      <p>No projects found for this organization.</p>
-    <% } %>
-  </section>
+    <!-- Projects belonging to this organization -->
+    <section class="org-projects">
+      <h2>Service Projects</h2>
+      <% if (projects && projects.length > 0) { %>
+        <ul>
+          <% projects.forEach(project => { %>
+            <li>
+              <a href="/project/<%= project.project_id %>"><%= project.title %></a>
+            </li>
+          <% }) %>
+        </ul>
+      <% } else { %>
+        <p>No projects found for this organization.</p>
+      <% } %>
+    </section>
 
-  <!-- Accessible navigation back to organizations list -->
-  <p><a href="/organizations">← Back to all organizations</a></p>
+    <!-- Navigation -->
+    <p><a href="/organizations">← Back to all organizations</a></p>
+  <% } else { %>
+    <!-- Fallback if organization not found -->
+    <h1>Organization not found</h1>
+    <p>Please check the link or return to the organizations list.</p>
+  <% } %>
 </main>
 
 <%- include('partials/footer') %>

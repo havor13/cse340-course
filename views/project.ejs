@@ -2,16 +2,24 @@
 
 <main>
   <% if (project) { %>
+    <!-- Project Details -->
     <h1><%= project.title %></h1>
     <p><%= project.description %></p>
 
     <h2>Details:</h2>
     <p><strong>Location:</strong> <%= project.location %></p>
-    <p><strong>Date:</strong> <%= project.date %></p>
+    <p>
+      <strong>Date:</strong>
+      <% if (project.project_date instanceof Date) { %>
+        <%= project.project_date.toDateString() %>
+      <% } else { %>
+        <%= project.project_date %>
+      <% } %>
+    </p>
 
     <h2>Partner Organization:</h2>
     <p>
-      <a href="/organization/<%= project.organization_id %>">
+      <a href="/organizations/<%= project.organization_id %>">
         <%= project.organization_name %>
       </a>
     </p>
@@ -29,10 +37,18 @@
       <% } %>
     </div>
 
+    <!-- Links for editing and assigning categories -->
     <p>
       <a href="/edit-project/<%= project.project_id %>" class="btn-small">✎ Edit Project</a>
+      <a href="/projects/<%= project.project_id %>/assign-categories" class="btn-small">Assign Categories</a>
+    </p>
+
+    <!-- Navigation -->
+    <p>
+      <a href="/projects">← Back to Projects</a>
     </p>
   <% } else { %>
+    <!-- Fallback if project not found -->
     <h1>Project not found</h1>
     <p>Please check the link or return to the projects list.</p>
   <% } %>
