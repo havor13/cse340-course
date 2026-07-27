@@ -6,11 +6,11 @@
   <!-- Flash messages -->
   <% if (messages && messages.success && messages.success.length > 0) { %>
     <div class="flash-success"><%= messages.success[0] %></div>
-  <% } %>
-  <% if (messages && messages.error && messages.error.length > 0) { %>
+  <% } else if (messages && messages.error && messages.error.length > 0) { %>
     <div class="flash-error"><%= messages.error[0] %></div>
   <% } %>
 
+  <!-- Project form -->
   <form action="/new-project" method="POST">
     <div class="form-group">
       <label for="title">Title</label>

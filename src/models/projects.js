@@ -107,7 +107,7 @@ export async function createProject(title, description, location, projectDate, o
   const query = `
     INSERT INTO projects (title, description, location, project_date, organization_id)
     VALUES ($1, $2, $3, $4, $5)
-    RETURNING project_id;
+    RETURNING project_id, title, description, location, project_date, organization_id;
   `;
   const params = [title, description, location, projectDate, organizationId];
   const result = await db.query(query, params);
@@ -120,7 +120,7 @@ export async function createProject(title, description, location, projectDate, o
     console.log("Created new project with ID:", result.rows[0].project_id);
   }
 
-  return result.rows[0].project_id;
+  return result.rows[0];
 }
 
 // ----------------------
@@ -135,7 +135,7 @@ export async function updateProject(projectId, title, description, location, pro
         project_date = $4,
         organization_id = $5
     WHERE project_id = $6
-    RETURNING project_id;
+    RETURNING project_id, title, description, location, project_date, organization_id;
   `;
   const params = [title, description, location, projectDate, organizationId, projectId];
   const result = await db.query(query, params);
@@ -148,7 +148,7 @@ export async function updateProject(projectId, title, description, location, pro
     console.log("Updated project with ID:", result.rows[0].project_id);
   }
 
-  return result.rows[0].project_id;
+  return result.rows[0];
 }
 
 // ----------------------
@@ -170,7 +170,7 @@ export async function deleteProject(projectId) {
     console.log("Deleted project with ID:", result.rows[0].project_id);
   }
 
-  return result.rows[0].project_id;
+  return result.rows[0];
 }
 
 // ----------------------

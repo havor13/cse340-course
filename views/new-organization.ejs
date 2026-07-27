@@ -4,14 +4,13 @@
   <h1><%= title %></h1>
 
   <!-- Flash messages -->
-  <% if (messages && messages.success) { %>
-    <p class="flash-success"><%= messages.success %></p>
-  <% } %>
-  <% if (messages && messages.error) { %>
-    <p class="flash-error"><%= messages.error %></p>
+  <% if (messages && messages.success && messages.success.length > 0) { %>
+    <p class="flash-success"><%= messages.success[0] %></p>
+  <% } else if (messages && messages.error && messages.error.length > 0) { %>
+    <p class="flash-error"><%= messages.error[0] %></p>
   <% } %>
 
-  <!-- Error messages -->
+  <!-- Validation errors -->
   <% if (errors && errors.length > 0) { %>
     <div class="error-messages">
       <ul>
@@ -19,13 +18,6 @@
           <li><%= error.msg %></li>
         <% }) %>
       </ul>
-    </div>
-  <% } %>
-
-  <!-- Success message -->
-  <% if (messages && messages.success && messages.success.length > 0) { %>
-    <div class="success-message">
-      <%= messages.success[0] %>
     </div>
   <% } %>
 
@@ -62,18 +54,6 @@
         value="<%= oldInput && oldInput.contactEmail ? oldInput.contactEmail : '' %>" 
         maxlength="255" 
         required
-      >
-    </div>
-
-    <!-- ✅ Logo field (optional, placeholder used if blank) -->
-    <div class="form-group">
-      <label for="logo_filename">Image URL</label>
-      <input 
-        type="text" 
-        id="logo_filename" 
-        name="logo_filename" 
-        value="<%= oldInput && oldInput.logo_filename ? oldInput.logo_filename : '' %>" 
-        placeholder="https://example.com/logo.png"
       >
     </div>
 

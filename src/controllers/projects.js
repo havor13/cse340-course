@@ -45,7 +45,8 @@ async function projectDetail(req, res) {
     res.render("project", {
       title: project.title,
       project,
-      categories: project.categories
+      categories: project.categories,
+      messages: req.flash()
     });
   } catch (err) {
     console.error("❌ Error in projectDetail:", err);
@@ -59,7 +60,7 @@ async function projectDetail(req, res) {
 async function listProjects(req, res) {
   try {
     const projects = await projectModel.getAllProjects();
-    res.render("projects", { title: "Projects", projects });
+    res.render("projects", { title: "Projects", projects, messages: req.flash() });
   } catch (err) {
     console.error("❌ Error fetching projects:", err);
     res.status(500).render("500", { title: "Server Error", error: err });
@@ -76,7 +77,8 @@ async function showNewProjectForm(req, res) {
       title: "New Project", 
       organizations, 
       errors: [], 
-      old: {} 
+      old: {}, 
+      messages: req.flash()
     });
   } catch (err) {
     console.error("❌ Error loading new project form:", err);
@@ -97,12 +99,13 @@ async function processNewProjectForm(req, res) {
       title: "New Project", 
       organizations, 
       errors: errors.array(), 
-      old: req.body 
+      old: req.body,
+      messages: req.flash()
     });
   }
 
   try {
-    const projectId = await projectModel.createProject(
+    const newProject = await projectModel.createProject(
       title,
       description,
       location,
@@ -110,7 +113,7 @@ async function processNewProjectForm(req, res) {
       parseInt(organizationId, 10)
     );
     req.flash("success", "Project created successfully!");
-    res.redirect(`/projects/${projectId}`);
+    res.redirect(`/projects/${newProject.project_id}`); // ✅ fixed
   } catch (err) {
     console.error("❌ Error creating project:", err);
     req.flash("error", "Failed to create project.");
@@ -141,7 +144,8 @@ async function showEditProjectForm(req, res) {
       project, 
       organizations, 
       errors: [], 
-      old: {} 
+      old: {}, 
+      messages: req.flash()
     });
   } catch (err) {
     console.error("❌ Error loading edit project form:", err);
@@ -164,12 +168,13 @@ async function processEditProjectForm(req, res) {
       project: { ...project, ...req.body }, 
       organizations, 
       errors: errors.array(), 
-      old: req.body 
+      old: req.body,
+      messages: req.flash()
     });
   }
 
   try {
-    const projectId = await projectModel.updateProject(
+    const updatedProject = await projectModel.updateProject(
       parseInt(req.params.id, 10),
       title,
       description,
@@ -178,7 +183,7 @@ async function processEditProjectForm(req, res) {
       parseInt(organizationId, 10)
     );
     req.flash("success", "Project updated successfully!");
-    res.redirect(`/projects/${projectId}`);
+    res.redirect(`/projects/${updatedProject.project_id}`); // ✅ fixed
   } catch (err) {
     console.error("❌ Error updating project:", err);
     req.flash("error", "Failed to update project.");
@@ -221,7 +226,8 @@ async function showAssignCategoriesForm(req, res) {
       project,
       categories,
       assignedCategories,
-      errors: [] // ✅ always defined
+      errors: [],
+      messages: req.flash()
     });
   } catch (err) {
     console.error("❌ Error loading assign categories form:", err);

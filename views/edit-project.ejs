@@ -1,24 +1,33 @@
 <%- include('partials/header') %>
 
 <main>
-  <h1>Edit Project</h1>
+  <h1>Edit Project | Service Network</h1>
 
   <!-- Flash messages -->
   <% if (messages && messages.success && messages.success.length > 0) { %>
     <div class="flash-success"><%= messages.success[0] %></div>
-  <% } %>
-  <% if (messages && messages.error && messages.error.length > 0) { %>
+  <% } else if (messages && messages.error && messages.error.length > 0) { %>
     <div class="flash-error"><%= messages.error[0] %></div>
   <% } %>
 
-  <form action="/edit-project/<%= project.project_id %>" method="POST">
+  <!-- Validation errors -->
+  <% if (errors && errors.length > 0) { %>
+    <ul class="error-list">
+      <% errors.forEach(error => { %>
+        <li><%= error.msg %></li>
+      <% }) %>
+    </ul>
+  <% } %>
+
+  <!-- Project form -->
+  <form action="/projects/edit-project/<%= project.project_id %>" method="POST">
     <div class="form-group">
       <label for="title">Title</label>
       <input 
         type="text" 
         id="title" 
         name="title" 
-        value="<%= old?.title || project.title %>" 
+        value="<%= project.title || '' %>" 
         required 
         maxlength="200" 
       />
@@ -31,7 +40,7 @@
         name="description" 
         required 
         maxlength="1000"
-      ><%= old?.description || project.description %></textarea>
+      ><%= project.description || '' %></textarea>
     </div>
 
     <div class="form-group">
@@ -40,7 +49,7 @@
         type="text" 
         id="location" 
         name="location" 
-        value="<%= old?.location || project.location %>" 
+        value="<%= project.location || '' %>" 
         required 
         maxlength="200" 
       />
@@ -52,7 +61,7 @@
         type="date" 
         id="project_date" 
         name="project_date" 
-        value="<%= old?.project_date || project.project_date %>" 
+        value="<%= project.project_date || '' %>" 
         required 
       />
     </div>
@@ -63,21 +72,13 @@
         <% organizations.forEach(org => { %>
           <option 
             value="<%= org.organization_id %>" 
-            <%= (old?.organizationId == org.organization_id || org.organization_id === project.organization_id) ? "selected" : "" %>
+            <%= project.organization_id == org.organization_id ? "selected" : "" %>
           >
             <%= org.name %>
           </option>
         <% }) %>
       </select>
     </div>
-
-    <% if (errors && errors.length > 0) { %>
-      <ul class="error-list">
-        <% errors.forEach(error => { %>
-          <li><%= error.msg %></li>
-        <% }) %>
-      </ul>
-    <% } %>
 
     <button type="submit">Update Project</button>
   </form>

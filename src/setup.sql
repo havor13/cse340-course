@@ -51,7 +51,7 @@ CREATE TABLE project_category (
     ON DELETE CASCADE
 );
 
--- Seed organizations (15 total)
+-- Seed organizations (15 total, all unique emails)
 INSERT INTO organizations (name, description, contact_email, logo_filename) VALUES
 ('Helping Hands', 'Community outreach and support.', 'contact@helpinghands.org', 'org1.png'),
 ('Green Earth', 'Environmental sustainability projects.', 'info@greenearth.org', 'org2.png'),

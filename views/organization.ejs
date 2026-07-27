@@ -1,54 +1,89 @@
 <%- include('partials/header') %>
 
 <main>
-  <% if (organization) { %>
-    <!-- Organization Details -->
-    <h1><%= organization.name %></h1>
+  <h1>New Project | Service Network</h1>
 
-    <section class="org-details">
-      <% if (organization.logo_filename) { %>
-        <img 
-          src="/images/<%= organization.logo_filename || 'placeholder-logo.png' %>" 
-          alt="<%= organization.name ? organization.name + ' logo' : 'Organization logo' %>"
-          style="max-width:200px;"
-        >
-      <% } %>
-      <p><%= organization.description %></p>
-      <p><strong>Contact Email:</strong> 
-        <a href="mailto:<%= organization.contact_email %>"><%= organization.contact_email %></a>
-      </p>
-
-      <!-- Edit Organization Link -->
-      <p>
-        <a href="/edit-organization/<%= organization.organization_id %>" class="btn-small">
-          ✏️ Edit Organization
-        </a>
-      </p>
-    </section>
-
-    <!-- Projects belonging to this organization -->
-    <section class="org-projects">
-      <h2>Service Projects</h2>
-      <% if (projects && projects.length > 0) { %>
-        <ul>
-          <% projects.forEach(project => { %>
-            <li>
-              <a href="/project/<%= project.project_id %>"><%= project.title %></a>
-            </li>
-          <% }) %>
-        </ul>
-      <% } else { %>
-        <p>No projects found for this organization.</p>
-      <% } %>
-    </section>
-
-    <!-- Navigation -->
-    <p><a href="/organizations">← Back to all organizations</a></p>
-  <% } else { %>
-    <!-- Fallback if organization not found -->
-    <h1>Organization not found</h1>
-    <p>Please check the link or return to the organizations list.</p>
+  <!-- Flash messages -->
+  <% if (messages && messages.success && messages.success.length > 0) { %>
+    <div class="flash-success"><%= messages.success[0] %></div>
+  <% } else if (messages && messages.error && messages.error.length > 0) { %>
+    <div class="flash-error"><%= messages.error[0] %></div>
   <% } %>
+
+  <!-- Validation errors -->
+  <% if (errors && errors.length > 0) { %>
+    <ul class="error-list">
+      <% errors.forEach(error => { %>
+        <li><%= error.msg %></li>
+      <% }) %>
+    </ul>
+  <% } %>
+
+  <!-- Project form -->
+  <form action="/projects/new-project" method="POST">
+    <div class="form-group">
+      <label for="title">Title</label>
+      <input 
+        type="text" 
+        id="title" 
+        name="title" 
+        value="<%= old?.title || '' %>" 
+        required 
+        maxlength="200" 
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea 
+        id="description" 
+        name="description" 
+        required 
+        maxlength="1000"
+      ><%= old?.description || '' %></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="location">Location</label>
+      <input 
+        type="text" 
+        id="location" 
+        name="location" 
+        value="<%= old?.location || '' %>" 
+        required 
+        maxlength="200" 
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="project_date">Date</label>
+      <input 
+        type="date" 
+        id="project_date" 
+        name="project_date" 
+        value="<%= old?.project_date || '' %>" 
+        required 
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="organizationId">Organization</label>
+      <select id="organizationId" name="organizationId" required>
+        <% organizations.forEach(org => { %>
+          <option 
+            value="<%= org.organization_id %>" 
+            <%= old?.organizationId == org.organization_id ? "selected" : "" %>
+          >
+            <%= org.name %>
+          </option>
+        <% }) %>
+      </select>
+    </div>
+
+    <button type="submit">Create Project</button>
+  </form>
+
+  <p><a href="/projects">← Back to Projects</a></p>
 </main>
 
 <%- include('partials/footer') %>

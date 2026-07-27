@@ -4,26 +4,15 @@
   <h1><%= title %></h1>
 
   <!-- Flash messages -->
-  <% if (messages && messages.success) { %>
-    <p class="flash-success"><%= messages.success %></p>
-  <% } %>
-  <% if (messages && messages.error) { %>
-    <div class="flash-error">
-      <% if (Array.isArray(messages.error)) { %>
-        <ul>
-          <% messages.error.forEach(function(msg) { %>
-            <li><%= msg %></li>
-          <% }) %>
-        </ul>
-      <% } else { %>
-        <p><%= messages.error %></p>
-      <% } %>
-    </div>
+  <% if (messages && messages.success && messages.success.length > 0) { %>
+    <p class="flash-success"><%= messages.success[0] %></p>
+  <% } else if (messages && messages.error && messages.error.length > 0) { %>
+    <p class="flash-error"><%= messages.error[0] %></p>
   <% } %>
 
   <!-- Add Project button -->
   <p>
-    <a href="/new-project" class="btn-small">+ Add a New Service Project</a>
+    <a href="/projects/new-project" class="btn-small">+ Add a New Service Project</a>
   </p>
 
   <section class="card-grid">
@@ -49,7 +38,7 @@
 
           <p>
             <strong>Organization:</strong>
-            <a href="/organization/<%= project.organization_id %>">
+            <a href="/organizations/<%= project.organization_id %>">
               <%= project.organization_name %>
             </a>
           </p>
@@ -59,7 +48,7 @@
             <p>
               Categories:
               <% project.categories.forEach(cat => { %>
-                <a href="/category/<%= cat.category_id %>" class="tag">
+                <a href="/categories/<%= cat.category_id %>" class="tag">
                   <%= cat.name %>
                 </a>
               <% }) %>
@@ -68,12 +57,12 @@
 
           <!-- Edit and Assign Categories buttons -->
           <p>
-            <a href="/edit-project/<%= project.project_id %>" class="btn-small">✏️ Edit</a>
+            <a href="/projects/edit-project/<%= project.project_id %>" class="btn-small">✏️ Edit</a>
             <a href="/projects/<%= project.project_id %>/assign-categories" class="btn-small">Assign Categories</a>
           </p>
 
           <!-- Delete button -->
-          <form action="/delete-project/<%= project.project_id %>" method="POST" style="display:inline;">
+          <form action="/projects/delete-project/<%= project.project_id %>" method="POST" style="display:inline;">
             <button type="submit" class="btn-small danger">🗑 Delete</button>
           </form>
         </div>

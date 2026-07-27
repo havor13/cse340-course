@@ -1,4 +1,3 @@
-// src/routes/projects.js
 import express from "express";
 import projectController, { projectValidation } from "../controllers/projects.js";
 

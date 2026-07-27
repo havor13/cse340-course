@@ -3,7 +3,7 @@ import { body, validationResult } from 'express-validator';
 import * as organizationModel from "../models/organizations.js";
 import * as projectModel from "../models/projects.js";
 
-// ✅ Validation rules
+// ✅ Validation rules (create only requires name, description, email)
 const organizationValidation = [
   body('name')
     .trim()
@@ -24,6 +24,7 @@ const organizationValidation = [
     .notEmpty().withMessage('Contact email is required')
     .isEmail().withMessage('Please provide a valid email address'),
 
+  // Logo only validated when editing
   body('logo_filename')
     .optional()
     .trim()
@@ -36,7 +37,7 @@ const organizationValidation = [
 async function listOrganizations(req, res) {
   try {
     const organizations = await organizationModel.getAllOrganizations();
-    res.render("organizations", { title: "Organizations", organizations });
+    res.render("organizations", { title: "Organizations", organizations, messages: req.flash() });
   } catch (err) {
     console.error("❌ Error fetching organizations:", err.message);
     res.status(500).render("500", { title: "Server Error", error: err.message });
@@ -46,7 +47,7 @@ async function listOrganizations(req, res) {
 // ✅ Show organization detail
 async function organizationDetail(req, res) {
   try {
-    const organizationId = req.params.id;
+    const organizationId = parseInt(req.params.id, 10); // ensure integer
     const organization = await organizationModel.getOrganizationById(organizationId);
     const projects = await projectModel.getProjectsByOrganizationId(organizationId);
 
@@ -54,7 +55,7 @@ async function organizationDetail(req, res) {
       return res.status(404).render("404", { title: "Not Found", message: "Organization not found" });
     }
 
-    res.render("organization", { title: organization.name, organization, projects });
+    res.render("organization", { title: organization.name, organization, projects, messages: req.flash() });
   } catch (err) {
     console.error("❌ Error in organizationDetail:", err.message);
     res.status(500).render("500", { title: "Server Error", error: err.message });
@@ -63,7 +64,12 @@ async function organizationDetail(req, res) {
 
 // ✅ Show form for creating new organization
 function showNewOrganizationForm(req, res) {
-  res.render("new-organization", { title: "Add New Organization", errors: null, oldInput: {} });
+  res.render("new-organization", { 
+    title: "Add New Organization", 
+    errors: null, 
+    oldInput: {}, 
+    messages: req.flash()
+  });
 }
 
 // ✅ Handle new organization form submission
@@ -73,20 +79,33 @@ const processNewOrganizationForm = async (req, res) => {
     return res.render("new-organization", { 
       title: "Add New Organization", 
       errors: results.array(),
-      oldInput: req.body
+      oldInput: req.body,
+      messages: req.flash()
     });
   }
 
   const { name, description, contactEmail } = req.body;
-  const logo = 'placeholder-logo.png'; // fallback logo
+  const logo = 'placeholder-logo.png'; // fallback logo always used on create
 
   try {
-    const organizationId = await organizationModel.createOrganization(name, description, contactEmail, logo);
+    const newOrg = await organizationModel.createOrganization(
+      name, 
+      description, 
+      contactEmail, 
+      logo
+    );
     req.flash('success', 'Organization added successfully!');
-    res.redirect(`/organization/${organizationId}`);
+    return res.redirect(`/organization/${newOrg.organization_id}`); // ✅ fixed
   } catch (err) {
     console.error("❌ Error creating organization:", err.message);
-    res.status(500).render("500", { title: "Server Error", error: err.message });
+
+    if (err.code === '23505') {
+      req.flash('error', 'An organization with this email already exists.');
+    } else {
+      req.flash('error', 'Server Error. Could not create organization.');
+    }
+
+    return res.redirect("/new-organization");
   }
 }
 
@@ -97,7 +116,13 @@ async function showEditOrganizationForm(req, res) {
     if (!organization) {
       return res.status(404).render("404", { title: "Not Found", message: "Organization not found" });
     }
-    res.render("edit-organization", { title: "Edit Organization", organization, errors: null, oldInput: {} });
+    res.render("edit-organization", { 
+      title: "Edit Organization", 
+      organization, 
+      errors: null, 
+      oldInput: {}, 
+      messages: req.flash()
+    });
   } catch (err) {
     console.error("❌ Error loading edit form:", err.message);
     res.status(500).render("500", { title: "Server Error", error: err.message });
@@ -107,7 +132,7 @@ async function showEditOrganizationForm(req, res) {
 // ✅ Handle update organization POST
 async function updateOrganization(req, res) {
   const { name, description, contactEmail, logo_filename } = req.body;
-  const id = req.params.id;
+  const id = parseInt(req.params.id, 10); // ensure integer
 
   const results = validationResult(req);
   if (!results.isEmpty()) {
@@ -116,7 +141,8 @@ async function updateOrganization(req, res) {
       title: "Edit Organization", 
       organization, 
       errors: results.array(),
-      oldInput: req.body
+      oldInput: req.body,
+      messages: req.flash()
     });
   }
 
@@ -129,10 +155,17 @@ async function updateOrganization(req, res) {
       logo_filename || 'placeholder-logo.png'
     );
     req.flash('success', 'Organization updated successfully!');
-    res.redirect(`/organization/${id}`);
+    return res.redirect(`/organization/${id}`);
   } catch (err) {
     console.error("❌ Error updating organization:", err.message);
-    res.status(500).render("500", { title: "Server Error", error: err.message });
+
+    if (err.code === '23505') {
+      req.flash('error', 'Another organization already uses this email.');
+    } else {
+      req.flash('error', 'Server Error. Could not update organization.');
+    }
+
+    return res.redirect(`/edit-organization/${id}`);
   }
 }
 
