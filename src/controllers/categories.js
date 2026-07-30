@@ -1,27 +1,43 @@
-// src/controllers/categories.js
 import { body, validationResult } from "express-validator";
 import * as categoryModel from "../models/categories.js";
 import * as projectModel from "../models/projects.js";
 
-// ✅ Validation rules for category form
+// ✅ Validation rules
 const categoryValidation = [
   body("name")
     .trim()
     .escape()
     .notEmpty().withMessage("Category name is required")
-    .isLength({ min: 3, max: 100 }).withMessage("Category name must be between 3 and 100 characters"),
-  body("image_url")
-    .optional()
-    .isURL().withMessage("Image URL must be a valid URL")
+    .isLength({ min: 3, max: 100 }).withMessage("Category name must be between 3 and 100 characters")
 ];
+
+// ✅ List all categories
+async function listCategories(req, res) {
+  try {
+    const categories = await categoryModel.getAllCategories();
+    res.render("categories", { 
+      title: "Categories", 
+      categories, 
+      errors: [] 
+    });
+  } catch (err) {
+    console.error("❌ Error fetching categories:", err);
+    req.flash("error", "Failed to load categories.");
+    res.redirect("/");
+  }
+}
 
 // ✅ Show category detail
 async function categoryDetail(req, res) {
   try {
     const categoryId = parseInt(req.params.id, 10);
+    if (isNaN(categoryId)) {
+      req.flash("error", "Invalid category ID.");
+      return res.redirect("/categories");
+    }
+
     const category = await categoryModel.getCategoryById(categoryId);
     const projects = await projectModel.getProjectsByCategoryId(categoryId);
-    const allCategories = await categoryModel.getAllCategories();
 
     if (!category) {
       return res.status(404).render("404", { title: "Not Found", message: "Category not found" });
@@ -30,8 +46,7 @@ async function categoryDetail(req, res) {
     res.render("category", { 
       title: category.name, 
       category, 
-      projects, 
-      allCategories 
+      projects 
     });
   } catch (err) {
     console.error("❌ Error in categoryDetail:", err);
@@ -39,13 +54,16 @@ async function categoryDetail(req, res) {
   }
 }
 
-// ✅ Show form for creating new category
+// ✅ Show new category form
 function showNewCategoryForm(req, res) {
-  res.render("new-category", { title: "New Category", errors: null });
+  res.render("new-category", { 
+    title: "New Category", 
+    errors: [] 
+  });
 }
 
 // ✅ Handle create category POST
-async function createCategory(req, res) {
+async function processNewCategoryForm(req, res) {
   const results = validationResult(req);
   if (!results.isEmpty()) {
     return res.render("new-category", { 
@@ -54,9 +72,9 @@ async function createCategory(req, res) {
     });
   }
 
-  const { name, image_url } = req.body;
+  const { name } = req.body;
   try {
-    const category = await categoryModel.createCategory(name, image_url);
+    const category = await categoryModel.createCategory(name);
     req.flash("success", "Category created successfully!");
     res.redirect(`/category/${category.category_id}`);
   } catch (err) {
@@ -66,17 +84,26 @@ async function createCategory(req, res) {
   }
 }
 
-// ✅ Show form for editing category
+// ✅ Show edit category form
 async function showEditCategoryForm(req, res) {
   try {
     const categoryId = parseInt(req.params.id, 10);
+    if (isNaN(categoryId)) {
+      req.flash("error", "Invalid category ID.");
+      return res.redirect("/categories");
+    }
+
     const category = await categoryModel.getCategoryById(categoryId);
 
     if (!category) {
       return res.status(404).render("404", { title: "Not Found", message: "Category not found" });
     }
 
-    res.render("edit-category", { title: "Edit Category", category, errors: null });
+    res.render("edit-category", { 
+      title: "Edit Category", 
+      category, 
+      errors: [] 
+    });
   } catch (err) {
     console.error("❌ Error loading edit form:", err);
     res.status(500).render("500", { title: "Server Error", error: err });
@@ -97,9 +124,9 @@ async function updateCategory(req, res) {
     });
   }
 
-  const { name, image_url } = req.body;
+  const { name } = req.body;
   try {
-    await categoryModel.updateCategory(id, name, image_url);
+    await categoryModel.updateCategory(id, name);
     req.flash("success", "Category updated successfully!");
     res.redirect(`/category/${id}`);
   } catch (err) {
@@ -109,19 +136,16 @@ async function updateCategory(req, res) {
   }
 }
 
-// ✅ Show assign categories form
+// ✅ Assign categories to project
 async function showAssignCategoriesForm(req, res) {
   try {
     const projectId = req.params.projectId;
-
     const projectDetails = await projectModel.getProjectDetails(projectId);
     const categories = await categoryModel.getAllCategories();
     const assignedCategories = await categoryModel.getCategoriesByProjectId(projectId);
 
-    const title = "Assign Categories to Project";
-
     res.render("assign-categories", { 
-      title, 
+      title: "Assign Categories to Project", 
       projectId, 
       projectDetails, 
       categories, 
@@ -133,7 +157,6 @@ async function showAssignCategoriesForm(req, res) {
   }
 }
 
-// ✅ Process assign categories form
 async function processAssignCategoriesForm(req, res) {
   try {
     const projectId = req.params.projectId;
@@ -143,7 +166,7 @@ async function processAssignCategoriesForm(req, res) {
       ? selectedCategoryIds
       : [selectedCategoryIds];
 
-    await categoryModel.updateCategoryAssignments(projectId, categoryIdsArray);
+    await categoryModel.updateProjectCategories(projectId, categoryIdsArray);
 
     req.flash("success", "Categories updated successfully.");
     res.redirect(`/project/${projectId}`);
@@ -155,9 +178,10 @@ async function processAssignCategoriesForm(req, res) {
 }
 
 export default { 
+  listCategories,
   categoryDetail, 
   showNewCategoryForm, 
-  createCategory, 
+  processNewCategoryForm, 
   showEditCategoryForm, 
   updateCategory,
   showAssignCategoriesForm,

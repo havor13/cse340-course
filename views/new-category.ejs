@@ -1,17 +1,38 @@
 <%- include('partials/header') %>
 
 <main>
-  <h1>Create New Category</h1>
+  <h1><%= title %></h1>
 
   <!-- Flash messages -->
   <% if (messages && messages.success) { %>
     <p class="flash-success"><%= messages.success %></p>
   <% } %>
   <% if (messages && messages.error) { %>
-    <p class="flash-error"><%= messages.error %></p>
+    <div class="flash-error">
+      <% if (Array.isArray(messages.error)) { %>
+        <ul>
+          <% messages.error.forEach(function(msg) { %>
+            <li><%= msg %></li>
+          <% }) %>
+        </ul>
+      <% } else { %>
+        <p><%= messages.error %></p>
+      <% } %>
+    </div>
   <% } %>
 
-  <!-- Category form -->
+  <!-- Error messages -->
+  <% if (errors && errors.length > 0) { %>
+    <div class="error-messages">
+      <ul>
+        <% errors.forEach(error => { %>
+          <li><%= error.msg ? error.msg : error %></li>
+        <% }) %>
+      </ul>
+    </div>
+  <% } %>
+
+  <!-- Create Category form -->
   <form action="/new-category" method="POST">
     <div class="form-group">
       <label for="name">Category Name</label>
@@ -19,25 +40,19 @@
         type="text" 
         id="name" 
         name="name" 
+        value="<%= (typeof oldInput !== 'undefined' && oldInput.name) ? oldInput.name : '' %>" 
         maxlength="100" 
         required
       >
+      <small>Max length: 100 characters</small>
     </div>
 
-    <!-- Show server-side validation errors -->
-    <% if (errors && errors.length > 0) { %>
-      <ul class="error-list">
-        <% errors.forEach(error => { %>
-          <li><%= error.msg %></li>
-        <% }) %>
-      </ul>
-    <% } %>
-
     <button type="submit">Create Category</button>
+    <a href="/categories" class="btn-cancel">Cancel</a>
   </form>
 
   <!-- Navigation -->
-  <p><a href="/new-categories">← Back to Categories</a></p>
+  <p><a href="/categories">← Back to all categories</a></p>
 </main>
 
 <%- include('partials/footer') %>

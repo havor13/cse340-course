@@ -1,7 +1,7 @@
 // src/models/organizations.js
 import db from "./db.js";
 
-// Get all organizations
+// ✅ Get all organizations
 export async function getAllOrganizations() {
   const query = `
     SELECT organization_id, name, description, contact_email, logo_filename
@@ -12,7 +12,7 @@ export async function getAllOrganizations() {
   return result.rows;
 }
 
-// Get a single organization by ID
+// ✅ Get a single organization by ID
 export async function getOrganizationById(id) {
   const query = `
     SELECT organization_id, name, description, contact_email, logo_filename

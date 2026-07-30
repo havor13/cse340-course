@@ -20,7 +20,7 @@
   </header>
 
   <!-- Flash Messages -->
-  <% if (messages) { %>
+  <% if (typeof messages !== 'undefined' && Object.keys(messages).length > 0) { %>
     <div class="flash-container">
       <% Object.keys(messages).forEach(type => { %>
         <% messages[type].forEach(msg => { %>

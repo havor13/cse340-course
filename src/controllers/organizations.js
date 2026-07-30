@@ -1,9 +1,8 @@
-// src/controllers/organizations.js
 import { body, validationResult } from 'express-validator';
 import * as organizationModel from "../models/organizations.js";
 import * as projectModel from "../models/projects.js";
 
-// ✅ Validation rules (create only requires name, description, email)
+// ✅ Validation rules
 const organizationValidation = [
   body('name')
     .trim()
@@ -24,7 +23,6 @@ const organizationValidation = [
     .notEmpty().withMessage('Contact email is required')
     .isEmail().withMessage('Please provide a valid email address'),
 
-  // Logo only validated when editing
   body('logo_filename')
     .optional()
     .trim()
@@ -39,34 +37,38 @@ async function listOrganizations(req, res) {
     const organizations = await organizationModel.getAllOrganizations();
     res.render("organizations", { 
       title: "Organizations", 
-      organizations 
+      organizations,
+      errors: [] 
     });
   } catch (err) {
     console.error("❌ Error fetching organizations:", err.message);
-    res.status(500).render("500", { title: "Server Error", error: err.message });
+    req.flash("error", "Failed to load organizations.");
+    res.redirect("/");
   }
 }
 
 // ✅ Show organization detail
 async function organizationDetail(req, res) {
   try {
-    const organizationId = parseInt(req.params.id, 10); // ensure integer
+    const organizationId = parseInt(req.params.id, 10);
     const organization = await organizationModel.getOrganizationById(organizationId);
     const projects = await projectModel.getProjectsByOrganizationId(organizationId);
 
     if (!organization) {
-      return res.status(404).render("404", { title: "Not Found", message: "Organization not found" });
+      req.flash("error", "Organization not found.");
+      return res.redirect("/organizations");
     }
 
     res.render("organization", { 
       title: organization.name, 
       organization, 
       projects, 
-      errors: []          // ✅ always defined
+      errors: [] 
     });
   } catch (err) {
     console.error("❌ Error in organizationDetail:", err.message);
-    res.status(500).render("500", { title: "Server Error", error: err.message });
+    req.flash("error", "Server error occurred while loading organization.");
+    res.redirect("/organizations");
   }
 }
 
@@ -74,7 +76,7 @@ async function organizationDetail(req, res) {
 function showNewOrganizationForm(req, res) {
   res.render("new-organization", { 
     title: "Add New Organization", 
-    errors: [],           // ✅ standardized to empty array
+    errors: [], 
     oldInput: {} 
   });
 }
@@ -83,15 +85,15 @@ function showNewOrganizationForm(req, res) {
 const processNewOrganizationForm = async (req, res) => {
   const results = validationResult(req);
   if (!results.isEmpty()) {
-    return res.render("new-organization", { 
-      title: "Add New Organization", 
-      errors: results.array(),
-      oldInput: req.body
+    // Loop through validation errors and flash them
+    results.array().forEach((error) => {
+      req.flash('error', error.msg);
     });
+    return res.redirect("/new-organization");
   }
 
   const { name, description, contactEmail } = req.body;
-  const logo = 'placeholder-logo.png'; // fallback logo always used on create
+  const logo = 'placeholder-logo.png';
 
   try {
     const newOrg = await organizationModel.createOrganization(
@@ -118,27 +120,29 @@ const processNewOrganizationForm = async (req, res) => {
 // ✅ Show form for editing organization
 async function showEditOrganizationForm(req, res) {
   try {
-    const organizationId = parseInt(req.params.id, 10); // ensure integer
+    const organizationId = parseInt(req.params.id, 10);
     const organization = await organizationModel.getOrganizationById(organizationId);
     if (!organization) {
-      return res.status(404).render("404", { title: "Not Found", message: "Organization not found" });
+      req.flash("error", "Organization not found.");
+      return res.redirect("/organizations");
     }
     res.render("edit-organization", { 
       title: "Edit Organization", 
       organization, 
-      errors: [],          // ✅ standardized to empty array
+      errors: [], 
       oldInput: {} 
     });
   } catch (err) {
     console.error("❌ Error loading edit form:", err.message);
-    res.status(500).render("500", { title: "Server Error", error: err.message });
+    req.flash("error", "Server error occurred while loading edit form.");
+    res.redirect("/organizations");
   }
 }
 
 // ✅ Handle update organization POST
 async function updateOrganization(req, res) {
   const { name, description, contactEmail, logo_filename } = req.body;
-  const id = parseInt(req.params.id, 10); // ensure integer
+  const id = parseInt(req.params.id, 10);
 
   const results = validationResult(req);
   if (!results.isEmpty()) {

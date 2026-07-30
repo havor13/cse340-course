@@ -3,28 +3,27 @@
 <main>
   <h1><%= title %></h1>
 
-  <!-- Success messages -->
-<% if (messages && messages.success && messages.success.length > 0) { %>
-  <div class="flash-success">
-    <ul>
-      <% messages.success.forEach(function(msg) { %>
-        <li><%= msg %></li>
-      <% }) %>
-    </ul>
-  </div>
-<% } %>
+  <!-- Flash success messages -->
+  <% if (messages && messages.success && messages.success.length > 0) { %>
+    <div class="flash-success">
+      <ul>
+        <% messages.success.forEach(function(msg) { %>
+          <li><%= msg %></li>
+        <% }) %>
+      </ul>
+    </div>
+  <% } %>
 
-<!-- Error messages -->
-<% if (messages && messages.error && messages.error.length > 0) { %>
-  <div class="flash-error">
-    <ul>
-      <% messages.error.forEach(function(msg) { %>
-        <li><%= msg %></li>
-      <% }) %>
-    </ul>
-  </div>
-<% } %>
-
+  <!-- Flash error messages -->
+  <% if (messages && messages.error && messages.error.length > 0) { %>
+    <div class="flash-error">
+      <ul>
+        <% messages.error.forEach(function(msg) { %>
+          <li><%= msg %></li>
+        <% }) %>
+      </ul>
+    </div>
+  <% } %>
 
   <!-- Validation errors -->
   <% if (errors && errors.length > 0) { %>

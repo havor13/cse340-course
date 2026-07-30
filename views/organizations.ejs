@@ -3,28 +3,38 @@
 <main>
   <h1><%= title %></h1>
 
-  <!-- Success messages -->
-<% if (messages && messages.success && messages.success.length > 0) { %>
-  <div class="flash-success">
-    <ul>
-      <% messages.success.forEach(function(msg) { %>
-        <li><%= msg %></li>
-      <% }) %>
-    </ul>
-  </div>
-<% } %>
+  <!-- Flash success messages -->
+  <% if (typeof messages !== 'undefined' && messages.success && messages.success.length > 0) { %>
+    <div class="flash-success">
+      <ul>
+        <% messages.success.forEach(function(msg) { %>
+          <li><%= msg %></li>
+        <% }) %>
+      </ul>
+    </div>
+  <% } %>
 
-<!-- Error messages -->
-<% if (messages && messages.error && messages.error.length > 0) { %>
-  <div class="flash-error">
-    <ul>
-      <% messages.error.forEach(function(msg) { %>
-        <li><%= msg %></li>
-      <% }) %>
-    </ul>
-  </div>
-<% } %>
+  <!-- Flash error messages -->
+  <% if (typeof messages !== 'undefined' && messages.error && messages.error.length > 0) { %>
+    <div class="flash-error">
+      <ul>
+        <% messages.error.forEach(function(msg) { %>
+          <li><%= msg %></li>
+        <% }) %>
+      </ul>
+    </div>
+  <% } %>
 
+  <!-- Validation errors -->
+  <% if (errors && errors.length > 0) { %>
+    <div class="error-messages">
+      <ul>
+        <% errors.forEach(error => { %>
+          <li><%= error.msg ? error.msg : error %></li>
+        <% }) %>
+      </ul>
+    </div>
+  <% } %>
 
   <!-- Link to create new organization -->
   <p>

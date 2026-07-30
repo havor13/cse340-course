@@ -1,56 +1,51 @@
 <%- include('partials/header') %>
 
 <main>
-  <% if (category) { %>
-    <!-- Category Details -->
-    <h1><%= category.name %></h1>
-    <p><%= category.description %></p>
+  <h1><%= category.name %></h1>
 
-    <% if (category.image_url) { %>
-      <div class="category-image">
-        <img src="<%= category.image_url %>" alt="Category image" style="max-width:300px;">
-      </div>
-    <% } %>
-
-    <!-- Navigation Links -->
-    <p>
-      <a href="/edit-category/<%= category.category_id %>" class="btn-small">
-        ✏️ Edit Category
-      </a>
-      <a href="/categories" class="btn-small">
-        ← Back to Categories
-      </a>
-    </p>
-
-    <!-- Projects in this Category -->
-    <h2>Projects in this Category:</h2>
-    <section class="card-grid">
-      <% if (projects && projects.length > 0) { %>
-        <% projects.forEach(project => { %>
-          <div class="card">
-            <h3>
-              <a href="/project/<%= project.project_id %>">
-                <%= project.title %>
-              </a>
-            </h3>
-            <p><%= project.description %></p>
-            <p>
-              <strong>Organization:</strong>
-              <a href="/organization/<%= project.organization_id %>">
-                <%= project.organization_name %>
-              </a>
-            </p>
-          </div>
-        <% }) %>
-      <% } else { %>
-        <p>No projects found for this category.</p>
-      <% } %>
-    </section>
-  <% } else { %>
-    <!-- Fallback if category not found -->
-    <h1>Category not found</h1>
-    <p>Please check the link or return to the categories list.</p>
+  <!-- Flash messages -->
+  <% if (messages.success && messages.success.length > 0) { %>
+    <div class="flash flash-success" aria-live="polite">
+      <% messages.success.forEach(msg => { %>
+        <p><%= msg %></p>
+      <% }) %>
+    </div>
   <% } %>
+
+  <% if (messages.error && messages.error.length > 0) { %>
+    <div class="flash flash-error" aria-live="polite">
+      <% messages.error.forEach(msg => { %>
+        <p><%= msg %></p>
+      <% }) %>
+    </div>
+  <% } %>
+
+  <!-- Category description -->
+  <% if (category.description) { %>
+    <p><%= category.description %></p>
+  <% } %>
+
+  <!-- Related projects -->
+  <section>
+    <h2>Projects in this Category</h2>
+    <% if (projects && projects.length > 0) { %>
+      <ul class="project-list">
+        <% projects.forEach(project => { %>
+          <li>
+            <a href="/project/<%= project.project_id %>"><%= project.name %></a>
+          </li>
+        <% }) %>
+      </ul>
+    <% } else { %>
+      <p>No projects assigned to this category yet.</p>
+    <% } %>
+  </section>
+
+  <!-- Actions -->
+  <p>
+    <a href="/edit-category/<%= category.category_id %>" class="btn btn-secondary">Edit Category</a>
+    <a href="/categories" class="btn btn-link">← Back to Categories</a>
+  </p>
 </main>
 
 <%- include('partials/footer') %>

@@ -1,4 +1,3 @@
-// src/models/categories.js
 import db from "./db.js";
 
 // ----------------------
@@ -39,54 +38,36 @@ export async function getCategoriesByProjectId(projectId) {
 }
 
 // ----------------------
-// Create a new category (with optional image_url)
+// Create a new category
 // ----------------------
-export async function createCategory(name, image_url = null) {
-  const query = image_url
-    ? `INSERT INTO categories (name, description, image_url) 
-       VALUES ($1, $2, $3) 
-       RETURNING *`
-    : `INSERT INTO categories (name, description) 
-       VALUES ($1, $2) 
-       RETURNING *`;
-
-  const params = image_url
-    ? [name, "Projects supporting learning and growth.", image_url]
-    : [name, "Projects supporting learning and growth."];
-
-  const result = await db.query(query, params);
+export async function createCategory(name) {
+  const result = await db.query(
+    `INSERT INTO categories (name, description) 
+     VALUES ($1, $2) 
+     RETURNING *`,
+    [name, "Projects supporting learning and academic growth."]
+  );
   return result.rows[0];
 }
 
 // ----------------------
-// Update an existing category (with optional image_url)
+// Update an existing category
 // ----------------------
-export async function updateCategory(id, name, image_url = null) {
+export async function updateCategory(id, name) {
   const categoryId = parseInt(id, 10);
-
-  const query = image_url
-    ? `UPDATE categories 
-       SET name = $1, image_url = $2 
-       WHERE category_id = $3 
-       RETURNING *`
-    : `UPDATE categories 
-       SET name = $1 
-       WHERE category_id = $2 
-       RETURNING *`;
-
-  const params = image_url
-    ? [name, image_url, categoryId]
-    : [name, categoryId];
-
-  const result = await db.query(query, params);
+  const result = await db.query(
+    `UPDATE categories 
+     SET name = $1 
+     WHERE category_id = $2 
+     RETURNING *`,
+    [name, categoryId]
+  );
   return result.rows[0];
 }
 
 // ----------------------
 // Assign categories to a project
 // ----------------------
-
-// Helper: assign a single category to a project
 async function assignCategoryToProject(categoryId, projectId) {
   await db.query(
     `INSERT INTO project_category (category_id, project_id)
@@ -95,14 +76,11 @@ async function assignCategoryToProject(categoryId, projectId) {
   );
 }
 
-// Update category assignments for a project
 export async function updateProjectCategories(projectId, categoryIds) {
   const projId = parseInt(projectId, 10);
 
-  // Remove old assignments
   await db.query(`DELETE FROM project_category WHERE project_id = $1`, [projId]);
 
-  // Add new assignments
   for (const categoryId of categoryIds) {
     const catId = parseInt(categoryId, 10);
     await assignCategoryToProject(catId, projId);

@@ -4,18 +4,26 @@
   <h1>Categories</h1>
 
   <!-- Flash messages -->
-  <% if (messages && messages.success) { %>
-    <p class="flash-success"><%= messages.success %></p>
-  <% } %>
-  <% if (messages && messages.error) { %>
-    <p class="flash-error"><%= messages.error %></p>
+  <% if (messages.success && messages.success.length > 0) { %>
+    <div class="flash flash-success" aria-live="polite">
+      <% messages.success.forEach(msg => { %>
+        <p><%= msg %></p>
+      <% }) %>
+    </div>
   <% } %>
 
-  <!-- Link to create new category -->
-  <p>
-    <a href="/new-category" class="btn">+ Add New Category</a>
-  </p>
+  <% if (messages.error && messages.error.length > 0) { %>
+    <div class="flash flash-error" aria-live="polite">
+      <% messages.error.forEach(msg => { %>
+        <p><%= msg %></p>
+      <% }) %>
+    </div>
+  <% } %>
 
+  <!-- Add new category link -->
+  <p><a href="/new-category" class="btn btn-primary">+ Add New Category</a></p>
+
+  <!-- Categories list -->
   <section class="card-grid">
     <% if (categories && categories.length > 0) { %>
       <% categories.forEach(category => { %>
@@ -25,22 +33,11 @@
               <%= category.name %>
             </a>
           </h2>
-
-          <% if (category.image_url) { %>
-            <div class="thumbnail">
-              <img src="<%= category.image_url %>" alt="Category image" style="max-width:150px;">
-            </div>
-          <% } %>
-
           <% if (category.description) { %>
             <p><%= category.description %></p>
           <% } %>
-
-          <!-- Edit link -->
           <p>
-            <a href="/edit-category/<%= category.category_id %>" class="btn-small">
-              Edit
-            </a>
+            <a href="/edit-category/<%= category.category_id %>" class="btn btn-secondary">Edit</a>
           </p>
         </div>
       <% }) %>

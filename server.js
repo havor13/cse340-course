@@ -26,7 +26,7 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Session middleware (required for flash)
+// ✅ Session middleware (required for flash)
 app.use(session({
   secret: SESSION_SECRET || "keyboard cat",
   resave: false,
@@ -34,10 +34,10 @@ app.use(session({
   cookie: { maxAge: 60 * 60 * 1000 } // 1 hour
 }));
 
-// Flash middleware
+// ✅ Flash middleware
 app.use(flash());
 
-// Make flash messages available in all views
+// ✅ Make flash messages available in all views
 app.use((req, res, next) => {
   res.locals.messages = req.flash();
   next();
@@ -52,13 +52,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // View engine
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views')); // ✅ point to correct folder
-
+app.set('views', path.join(__dirname, 'views'));
 
 // ✅ Routes
-app.use("/", categoryRoutes);     // categories routes
-app.use("/projects", projectRoutes);        // projects routes
-app.use("/", organizationRoutes); // organizations routes
+app.use("/", categoryRoutes);     
+app.use("/projects", projectRoutes);        
+app.use("/", organizationRoutes); 
 
 // Home route
 app.get('/', (req, res) => res.render('home', { title: 'Home' }));
@@ -67,7 +66,7 @@ app.get('/', (req, res) => res.render('home', { title: 'Home' }));
 app.get('/organizations', async (req, res) => {
   try {
     const organizations = await getAllOrganizations();
-    res.render('organizations', { title: 'Our Partner Organizations', organizations });
+    res.render('organizations', { title: 'Our Partner Organizations', organizations, errors: [] });
   } catch (error) {
     console.error('❌ Error fetching organizations:', error.message);
     req.flash("error", "Failed to load organizations.");
@@ -79,7 +78,7 @@ app.get('/organizations', async (req, res) => {
 app.get('/categories', async (req, res) => {
   try {
     const result = await db.query('SELECT * FROM categories ORDER BY category_id');
-    res.render('categories', { title: 'Categories', categories: result.rows });
+    res.render('categories', { title: 'Categories', categories: result.rows, errors: [] });
   } catch (error) {
     console.error('❌ Error fetching categories:', error.message);
     req.flash("error", "Failed to load categories.");
@@ -90,7 +89,7 @@ app.get('/categories', async (req, res) => {
 // Example form submission route
 app.post('/submit', (req, res) => {
   const { name, email } = req.body;
-  res.render('success', { title: 'Form Submitted', name, email });
+  res.render('success', { title: 'Form Submitted', name, email, errors: [] });
 });
 
 // DB test route
@@ -106,14 +105,14 @@ app.get('/test-db', async (req, res) => {
 
 // 404 handler
 app.use((req, res) => {
-  res.status(404).render('404', { title: 'Page Not Found' });
+  res.status(404).render('404', { title: 'Page Not Found', errors: [] });
 });
 
 // Global error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
   req.flash("error", "Server error occurred.");
-  res.status(500).render('500', { title: 'Server Error' });
+  res.status(500).render('500', { title: 'Server Error', errors: [] });
 });
 
 // Start server
