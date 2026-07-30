@@ -49,6 +49,9 @@ export async function getProjectById(id) {
      GROUP BY p.project_id, o.name`,
     [id]
   );
+  if (result.rows.length === 0) {
+    throw new Error("Project not found");
+  }
   return result.rows[0];
 }
 
@@ -103,13 +106,14 @@ export async function getProjectsByOrganizationId(organizationId) {
 // ----------------------
 // Create a new project
 // ----------------------
+
 export async function createProject(title, description, location, projectDate, organizationId) {
   const query = `
-    INSERT INTO projects (title, description, location, project_date, organization_id)
+    INSERT INTO projects (organization_id, title, description, project_date, location)
     VALUES ($1, $2, $3, $4, $5)
     RETURNING project_id, title, description, location, project_date, organization_id;
   `;
-  const params = [title, description, location, projectDate, organizationId];
+  const params = [organizationId, title, description, projectDate, location];
   const result = await db.query(query, params);
 
   if (result.rows.length === 0) {
@@ -120,9 +124,8 @@ export async function createProject(title, description, location, projectDate, o
     console.log("Created new project with ID:", result.rows[0].project_id);
   }
 
-  return result.rows[0];
+  return result.rows[0]; // ✅ ensures project_id is available
 }
-
 // ----------------------
 // Update an existing project
 // ----------------------
@@ -206,4 +209,7 @@ export async function updateProjectCategories(projectId, categoryIds) {
   if (process.env.ENABLE_SQL_LOGGING === "true") {
     console.log(`Updated categories for project ID: ${projectId}`);
   }
+
+  // Return updated categories for controller convenience
+  return await getCategoriesByProjectId(projectId);
 }

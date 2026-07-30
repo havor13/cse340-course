@@ -1,17 +1,26 @@
 <%- include('partials/header') %>
 
-<main>
-  <h1>New Project | Service Network</h1>
+<main class="container">
+  <h1 class="page-title">New Project | Service Network</h1>
 
   <!-- Flash messages -->
   <% if (messages && messages.success && messages.success.length > 0) { %>
-    <div class="flash-success"><%= messages.success[0] %></div>
+    <div class="flash flash-success"><%= messages.success[0] %></div>
   <% } else if (messages && messages.error && messages.error.length > 0) { %>
-    <div class="flash-error"><%= messages.error[0] %></div>
+    <div class="flash flash-error"><%= messages.error[0] %></div>
+  <% } %>
+
+  <!-- Validation errors -->
+  <% if (errors && errors.length > 0) { %>
+    <ul class="error-list">
+      <% errors.forEach(error => { %>
+        <li><%= error.msg %></li>
+      <% }) %>
+    </ul>
   <% } %>
 
   <!-- Project form -->
-  <form action="/new-project" method="POST">
+  <form action="/projects/new-project" method="POST">
     <div class="form-group">
       <label for="title">Title</label>
       <input 
@@ -71,18 +80,11 @@
       </select>
     </div>
 
-    <% if (errors && errors.length > 0) { %>
-      <ul class="error-list">
-        <% errors.forEach(error => { %>
-          <li><%= error.msg %></li>
-        <% }) %>
-      </ul>
-    <% } %>
-
-    <button type="submit">Create Project</button>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Create Project</button>
+      <a href="/projects" class="btn btn-secondary">← Back to Projects</a>
+    </div>
   </form>
-
-  <p><a href="/projects">← Back to Projects</a></p>
 </main>
 
 <%- include('partials/footer') %>

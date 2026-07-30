@@ -1,10 +1,11 @@
+// src/routes/projects.js
 import express from "express";
 import projectController, { projectValidation } from "../controllers/projects.js";
 
 const router = express.Router();
 
 // ----------------------
-// New project routes
+// Create project routes
 // ----------------------
 
 // Show new project form
@@ -29,7 +30,7 @@ router.post("/edit-project/:id", projectValidation, projectController.processEdi
 router.post("/delete-project/:id", projectController.deleteProject);
 
 // ----------------------
-// Assign categories routes
+// Category assignment routes
 // ----------------------
 
 // Show assign categories form

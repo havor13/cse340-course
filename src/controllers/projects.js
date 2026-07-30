@@ -1,3 +1,4 @@
+// src/controllers/projects.js
 import { body, validationResult } from "express-validator";
 import * as projectModel from "../models/projects.js";
 import { getAllOrganizations } from "../models/organizations.js";
@@ -36,17 +37,14 @@ async function projectDetail(req, res) {
     const project = await projectModel.getProjectById(projectId);
 
     if (!project) {
-      return res.status(404).render("404", {
-        title: "Not Found",
-        message: "Project not found"
-      });
+      return res.status(404).render("404", { title: "Not Found", message: "Project not found" });
     }
 
     res.render("project", {
       title: project.title,
       project,
       categories: project.categories,
-      messages: req.flash()
+      errors: []
     });
   } catch (err) {
     console.error("❌ Error in projectDetail:", err);
@@ -60,7 +58,7 @@ async function projectDetail(req, res) {
 async function listProjects(req, res) {
   try {
     const projects = await projectModel.getAllProjects();
-    res.render("projects", { title: "Projects", projects, messages: req.flash() });
+    res.render("projects", { title: "Projects", projects });
   } catch (err) {
     console.error("❌ Error fetching projects:", err);
     res.status(500).render("500", { title: "Server Error", error: err });
@@ -77,8 +75,7 @@ async function showNewProjectForm(req, res) {
       title: "New Project", 
       organizations, 
       errors: [], 
-      old: {}, 
-      messages: req.flash()
+      old: {} 
     });
   } catch (err) {
     console.error("❌ Error loading new project form:", err);
@@ -99,8 +96,7 @@ async function processNewProjectForm(req, res) {
       title: "New Project", 
       organizations, 
       errors: errors.array(), 
-      old: req.body,
-      messages: req.flash()
+      old: req.body
     });
   }
 
@@ -112,12 +108,18 @@ async function processNewProjectForm(req, res) {
       project_date,
       parseInt(organizationId, 10)
     );
+
+    if (!newProject || !newProject.project_id) {
+      req.flash("error", "Failed to create project.");
+      return res.redirect("/projects/new");
+    }
+
     req.flash("success", "Project created successfully!");
-    res.redirect(`/projects/${newProject.project_id}`); // ✅ fixed
+    return res.redirect(`/projects/${newProject.project_id}`);
   } catch (err) {
     console.error("❌ Error creating project:", err);
-    req.flash("error", "Failed to create project.");
-    res.redirect("/projects");
+    req.flash("error", "Database error: " + err.message);
+    return res.redirect("/projects/new");
   }
 }
 
@@ -134,7 +136,6 @@ async function showEditProjectForm(req, res) {
       return res.status(404).render("404", { title: "Not Found", message: "Project not found" });
     }
 
-    // Ensure project_date is formatted for input[type=date]
     if (project.project_date instanceof Date) {
       project.project_date = project.project_date.toISOString().split("T")[0];
     }
@@ -144,8 +145,7 @@ async function showEditProjectForm(req, res) {
       project, 
       organizations, 
       errors: [], 
-      old: {}, 
-      messages: req.flash()
+      old: {} 
     });
   } catch (err) {
     console.error("❌ Error loading edit project form:", err);
@@ -168,8 +168,7 @@ async function processEditProjectForm(req, res) {
       project: { ...project, ...req.body }, 
       organizations, 
       errors: errors.array(), 
-      old: req.body,
-      messages: req.flash()
+      old: req.body
     });
   }
 
@@ -182,12 +181,15 @@ async function processEditProjectForm(req, res) {
       project_date,
       parseInt(organizationId, 10)
     );
+
+    if (!updatedProject) throw new Error("Project update failed");
+
     req.flash("success", "Project updated successfully!");
-    res.redirect(`/projects/${updatedProject.project_id}`); // ✅ fixed
+    return res.redirect(`/projects/${updatedProject.project_id}`);
   } catch (err) {
     console.error("❌ Error updating project:", err);
     req.flash("error", "Failed to update project.");
-    res.redirect("/projects");
+    return res.redirect("/projects");
   }
 }
 
@@ -226,8 +228,7 @@ async function showAssignCategoriesForm(req, res) {
       project,
       categories,
       assignedCategories,
-      errors: [],
-      messages: req.flash()
+      errors: []
     });
   } catch (err) {
     console.error("❌ Error loading assign categories form:", err);

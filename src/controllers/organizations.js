@@ -37,7 +37,10 @@ const organizationValidation = [
 async function listOrganizations(req, res) {
   try {
     const organizations = await organizationModel.getAllOrganizations();
-    res.render("organizations", { title: "Organizations", organizations, messages: req.flash() });
+    res.render("organizations", { 
+      title: "Organizations", 
+      organizations 
+    });
   } catch (err) {
     console.error("❌ Error fetching organizations:", err.message);
     res.status(500).render("500", { title: "Server Error", error: err.message });
@@ -55,7 +58,12 @@ async function organizationDetail(req, res) {
       return res.status(404).render("404", { title: "Not Found", message: "Organization not found" });
     }
 
-    res.render("organization", { title: organization.name, organization, projects, messages: req.flash() });
+    res.render("organization", { 
+      title: organization.name, 
+      organization, 
+      projects, 
+      errors: []          // ✅ always defined
+    });
   } catch (err) {
     console.error("❌ Error in organizationDetail:", err.message);
     res.status(500).render("500", { title: "Server Error", error: err.message });
@@ -66,9 +74,8 @@ async function organizationDetail(req, res) {
 function showNewOrganizationForm(req, res) {
   res.render("new-organization", { 
     title: "Add New Organization", 
-    errors: null, 
-    oldInput: {}, 
-    messages: req.flash()
+    errors: [],           // ✅ standardized to empty array
+    oldInput: {} 
   });
 }
 
@@ -79,8 +86,7 @@ const processNewOrganizationForm = async (req, res) => {
     return res.render("new-organization", { 
       title: "Add New Organization", 
       errors: results.array(),
-      oldInput: req.body,
-      messages: req.flash()
+      oldInput: req.body
     });
   }
 
@@ -94,8 +100,8 @@ const processNewOrganizationForm = async (req, res) => {
       contactEmail, 
       logo
     );
-    req.flash('success', 'Organization added successfully!');
-    return res.redirect(`/organization/${newOrg.organization_id}`); // ✅ fixed
+    req.flash('success', 'Organization created successfully!');
+    return res.redirect(`/organization/${newOrg.organization_id}`);
   } catch (err) {
     console.error("❌ Error creating organization:", err.message);
 
@@ -112,16 +118,16 @@ const processNewOrganizationForm = async (req, res) => {
 // ✅ Show form for editing organization
 async function showEditOrganizationForm(req, res) {
   try {
-    const organization = await organizationModel.getOrganizationById(req.params.id);
+    const organizationId = parseInt(req.params.id, 10); // ensure integer
+    const organization = await organizationModel.getOrganizationById(organizationId);
     if (!organization) {
       return res.status(404).render("404", { title: "Not Found", message: "Organization not found" });
     }
     res.render("edit-organization", { 
       title: "Edit Organization", 
       organization, 
-      errors: null, 
-      oldInput: {}, 
-      messages: req.flash()
+      errors: [],          // ✅ standardized to empty array
+      oldInput: {} 
     });
   } catch (err) {
     console.error("❌ Error loading edit form:", err.message);
@@ -141,8 +147,7 @@ async function updateOrganization(req, res) {
       title: "Edit Organization", 
       organization, 
       errors: results.array(),
-      oldInput: req.body,
-      messages: req.flash()
+      oldInput: req.body
     });
   }
 
