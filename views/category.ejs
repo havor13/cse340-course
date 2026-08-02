@@ -43,7 +43,10 @@
 
   <!-- Actions -->
   <p>
-    <a href="/edit-category/<%= category.category_id %>" class="btn btn-secondary">Edit Category</a>
+    <% if (user && user.role_name === 'admin') { %>
+      <a href="/edit-category/<%= category.category_id %>" class="btn btn-secondary">✏️ Edit Category</a>
+      |
+    <% } %>
     <a href="/categories" class="btn btn-link">← Back to Categories</a>
   </p>
 </main>

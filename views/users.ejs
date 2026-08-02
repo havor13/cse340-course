@@ -1,0 +1,55 @@
+<%- include('partials/header') %>
+
+<main>
+  <h1><%= title %></h1>
+
+  <!-- Flash messages -->
+  <% if (messages.success && messages.success.length > 0) { %>
+    <div class="flash flash-success" aria-live="polite">
+      <% messages.success.forEach(msg => { %>
+        <p><%= msg %></p>
+      <% }) %>
+    </div>
+  <% } %>
+
+  <% if (messages.error && messages.error.length > 0) { %>
+    <div class="flash flash-error" aria-live="polite">
+      <% messages.error.forEach(msg => { %>
+        <p><%= msg %></p>
+      <% }) %>
+    </div>
+  <% } %>
+
+  <!-- Users table -->
+  <section>
+    <% if (users && users.length > 0) { %>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email (Username)</th>
+            <th>Role</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% users.forEach(user => { %>
+            <tr>
+              <td><%= user.name %></td>
+              <td><%= user.email %></td>
+              <td><%= user.role_name %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    <% } else { %>
+      <p>No registered users found.</p>
+    <% } %>
+  </section>
+
+  <!-- Back to dashboard -->
+  <p>
+    <a href="/dashboard" class="btn btn-link">← Back to Dashboard</a>
+  </p>
+</main>
+
+<%- include('partials/footer') %>

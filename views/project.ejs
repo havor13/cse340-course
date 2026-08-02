@@ -40,15 +40,17 @@
       </p>
     <% } %>
 
-    <!-- Action buttons -->
-    <p>
-      <a href="/projects/edit-project/<%= project.project_id %>" class="btn-small">✏️ Edit</a>
-      <a href="/projects/<%= project.project_id %>/assign-categories" class="btn-small">Assign Categories</a>
-    </p>
+    <!-- Action buttons (admin-only) -->
+    <% if (user && user.role_name === 'admin') { %>
+      <p>
+        <a href="/projects/edit-project/<%= project.project_id %>" class="btn-small">✏️ Edit</a>
+        <a href="/projects/<%= project.project_id %>/assign-categories" class="btn-small">Assign Categories</a>
+      </p>
 
-    <form action="/projects/delete-project/<%= project.project_id %>" method="POST" style="display:inline;">
-      <button type="submit" class="btn-small danger">🗑 Delete</button>
-    </form>
+      <form action="/projects/delete-project/<%= project.project_id %>" method="POST" style="display:inline;">
+        <button type="submit" class="btn-small danger">🗑 Delete</button>
+      </form>
+    <% } %>
   </section>
 
   <!-- Back to list -->

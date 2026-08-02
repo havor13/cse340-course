@@ -3,6 +3,11 @@
 <main>
   <h1><%= title %></h1>
   <p>Welcome to the Service Network site. Explore organizations, projects, and categories to see how service is making a difference.</p>
+
+  <% if (isLoggedIn) { %>
+     <p><strong>Welcome, <%= user.name %>!</strong></p>
+    <p><a href="/dashboard">My Dashboard</a></p>
+  <% } %>
 </main>
 
 <%- include('partials/footer') %>

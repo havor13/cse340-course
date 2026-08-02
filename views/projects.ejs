@@ -10,10 +10,12 @@
     <p class="flash-error"><%= messages.error[0] %></p>
   <% } %>
 
-  <!-- Add Project button -->
-  <p>
-    <a href="/projects/new-project" class="btn-small">+ Add a New Service Project</a>
-  </p>
+  <!-- Add Project button (admin-only) -->
+  <% if (user && user.role_name === 'admin') { %>
+    <p>
+      <a href="/projects/new-project" class="btn-small">+ Add a New Service Project</a>
+    </p>
+  <% } %>
 
   <section class="card-grid">
     <% if (projects && projects.length > 0) { %>
@@ -56,15 +58,17 @@
             </p>
           <% } %>
 
-          <!-- Action buttons -->
-          <p>
-            <a href="/projects/edit-project/<%= project.project_id %>" class="btn-small">✏️ Edit</a>
-            <a href="/projects/<%= project.project_id %>/assign-categories" class="btn-small">Assign Categories</a>
-          </p>
+          <!-- Action buttons (admin-only) -->
+          <% if (user && user.role_name === 'admin') { %>
+            <p>
+              <a href="/projects/edit-project/<%= project.project_id %>" class="btn-small">✏️ Edit</a>
+              <a href="/projects/<%= project.project_id %>/assign-categories" class="btn-small">Assign Categories</a>
+            </p>
 
-          <form action="/projects/delete-project/<%= project.project_id %>" method="POST" style="display:inline;">
-            <button type="submit" class="btn-small danger">🗑 Delete</button>
-          </form>
+            <form action="/projects/delete-project/<%= project.project_id %>" method="POST" style="display:inline;">
+              <button type="submit" class="btn-small danger">🗑 Delete</button>
+            </form>
+          <% } %>
         </div>
       <% }) %>
     <% } else { %>

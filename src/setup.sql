@@ -3,36 +3,33 @@ DROP TABLE IF EXISTS project_category;
 DROP TABLE IF EXISTS projects;
 DROP TABLE IF EXISTS categories;
 DROP TABLE IF EXISTS organizations;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS roles;
 
 -- Organizations
 CREATE TABLE organizations (
-  organization_id SERIAL,
+  organization_id SERIAL PRIMARY KEY,
   name VARCHAR(150) NOT NULL,
   description TEXT NOT NULL,
-  contact_email VARCHAR(255) NOT NULL,
-  logo_filename VARCHAR(255) NOT NULL,
-  CONSTRAINT pk_organizations PRIMARY KEY (organization_id),
-  CONSTRAINT uq_org_email UNIQUE (contact_email)
+  contact_email VARCHAR(255) UNIQUE NOT NULL,
+  logo_filename VARCHAR(255) NOT NULL
 );
 
 -- Categories
 CREATE TABLE categories (
-  category_id SERIAL,
-  name VARCHAR(100) NOT NULL,
-  description TEXT NOT NULL,
-  CONSTRAINT pk_categories PRIMARY KEY (category_id),
-  CONSTRAINT uq_category_name UNIQUE (name)
+  category_id SERIAL PRIMARY KEY,
+  name VARCHAR(100) UNIQUE NOT NULL,
+  description TEXT NOT NULL
 );
 
 -- Projects
 CREATE TABLE projects (
-  project_id SERIAL,
+  project_id SERIAL PRIMARY KEY,
   organization_id INT NOT NULL,
   title VARCHAR(150) NOT NULL,
   description TEXT NOT NULL,
   project_date DATE NOT NULL,
   location VARCHAR(150) NOT NULL,
-  CONSTRAINT pk_projects PRIMARY KEY (project_id),
   CONSTRAINT fk_projects_org FOREIGN KEY (organization_id)
     REFERENCES organizations(organization_id)
     ON DELETE CASCADE
@@ -42,13 +39,30 @@ CREATE TABLE projects (
 CREATE TABLE project_category (
   project_id INT NOT NULL,
   category_id INT NOT NULL,
-  CONSTRAINT pk_project_category PRIMARY KEY (project_id, category_id),
+  PRIMARY KEY (project_id, category_id),
   CONSTRAINT fk_project FOREIGN KEY (project_id)
     REFERENCES projects(project_id)
     ON DELETE CASCADE,
   CONSTRAINT fk_category FOREIGN KEY (category_id)
     REFERENCES categories(category_id)
     ON DELETE CASCADE
+);
+
+-- Roles (RBAC)
+CREATE TABLE roles (
+    role_id SERIAL PRIMARY KEY,
+    role_name VARCHAR(50) UNIQUE NOT NULL,
+    role_description TEXT
+);
+
+-- Users (linked to roles)
+CREATE TABLE users (
+    user_id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    role_id INTEGER REFERENCES roles(role_id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Seed organizations (15 total, all unique emails)
@@ -93,8 +107,35 @@ INSERT INTO project_category (project_id, category_id) VALUES
 (4, 2), -- Health Fair → Health
 (5, 3); -- Food Distribution → Community Service
 
+-- Seed roles
+INSERT INTO roles (role_name, role_description) VALUES
+('user', 'Standard user with basic access'),
+('admin', 'Administrator with full system access');
+
+-- Seed admin user (password: cse340!)
+-- Replace the hash with a bcrypt hash of "cse340!"
+INSERT INTO users (name, email, password_hash, role_id)
+VALUES (
+  'Admin User',
+  'admin@example.com',
+  '$2b$10$REPLACE_THIS_WITH_YOUR_BCRYPT_HASH', -- bcrypt hash of "cse340!"
+  (SELECT role_id FROM roles WHERE role_name = 'admin')
+);
+
+UPDATE users
+SET password_hash = '$2b$10$op1LQ64Sz0n7a/0sdyUDrulSKjJsXWXyPJrEqIw9OK1/t7Ssq3VXG'
+WHERE email = 'admin@example.com';
+
 -- Verification queries
 SELECT * FROM organizations;
 SELECT * FROM categories;
 SELECT * FROM projects;
 SELECT * FROM project_category;
+SELECT * FROM roles;
+SELECT * FROM users;
+
+SELECT user_id, name, email, role_id FROM users;
+SELECT * FROM users WHERE email = 'admin@example.com';
+SELECT email, password_hash, role_id
+FROM users
+WHERE email = 'admin@example.com';

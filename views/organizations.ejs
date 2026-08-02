@@ -36,10 +36,12 @@
     </div>
   <% } %>
 
-  <!-- Link to create new organization -->
-  <p>
-    <a href="/new-organization" class="btn">+ Add New Organization</a>
-  </p>
+  <!-- Link to create new organization (admin-only) -->
+  <% if (user && user.role_name === 'admin') { %>
+    <p>
+      <a href="/new-organization" class="btn">+ Add New Organization</a>
+    </p>
+  <% } %>
 
   <!-- Organizations list -->
   <section class="card-grid">
@@ -61,12 +63,14 @@
             <a href="mailto:<%= org.contact_email %>"><%= org.contact_email %></a>
           </p>
 
-          <!-- Edit link -->
-          <p>
-            <a href="/edit-organization/<%= org.organization_id %>" class="btn-small">
-              ✏️ Edit
-            </a>
-          </p>
+          <!-- Edit link (admin-only) -->
+          <% if (user && user.role_name === 'admin') { %>
+            <p>
+              <a href="/edit-organization/<%= org.organization_id %>" class="btn-small">
+                ✏️ Edit
+              </a>
+            </p>
+          <% } %>
         </div>
       <% }) %>
     <% } else { %>

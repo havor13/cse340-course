@@ -20,8 +20,10 @@
     </div>
   <% } %>
 
-  <!-- Add new category link -->
-  <p><a href="/new-category" class="btn btn-primary">+ Add New Category</a></p>
+  <!-- Add new category link (admin-only) -->
+  <% if (user && user.role_name === 'admin') { %>
+    <p><a href="/new-category" class="btn btn-primary">+ Add New Category</a></p>
+  <% } %>
 
   <!-- Categories list -->
   <section class="card-grid">
@@ -36,9 +38,13 @@
           <% if (category.description) { %>
             <p><%= category.description %></p>
           <% } %>
-          <p>
-            <a href="/edit-category/<%= category.category_id %>" class="btn btn-secondary">Edit</a>
-          </p>
+
+          <!-- Edit link (admin-only) -->
+          <% if (user && user.role_name === 'admin') { %>
+            <p>
+              <a href="/edit-category/<%= category.category_id %>" class="btn btn-secondary">✏️ Edit</a>
+            </p>
+          <% } %>
         </div>
       <% }) %>
     <% } else { %>

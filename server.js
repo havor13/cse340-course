@@ -10,6 +10,7 @@ import morgan from 'morgan';
 import categoryRoutes from './src/routes/categories.js';
 import projectRoutes from './src/routes/projects.js';
 import organizationRoutes from "./src/routes/organizations.js";
+import registrationRoutes from "./src/routes.js"; // ✅ import registration & login routes
 import session from "express-session";
 import flash from "connect-flash"; // ✅ use connect-flash
 
@@ -37,9 +38,19 @@ app.use(session({
 // ✅ Flash middleware
 app.use(flash());
 
-// ✅ Make flash messages available in all views
+// ✅ Middleware to expose login state and user role to all views
 app.use((req, res, next) => {
   res.locals.messages = req.flash();
+
+  res.locals.isLoggedIn = false;
+  res.locals.user = null;
+
+  if (req.session && req.session.user) {
+    res.locals.isLoggedIn = true;
+    res.locals.user = req.session.user; // ✅ includes role_name
+  }
+
+  res.locals.NODE_ENV = NODE_ENV;
   next();
 });
 
@@ -58,6 +69,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.use("/", categoryRoutes);     
 app.use("/projects", projectRoutes);        
 app.use("/", organizationRoutes); 
+app.use("/", registrationRoutes); // ✅ mount registration & login routes
 
 // Home route
 app.get('/', (req, res) => res.render('home', { title: 'Home' }));
@@ -66,7 +78,11 @@ app.get('/', (req, res) => res.render('home', { title: 'Home' }));
 app.get('/organizations', async (req, res) => {
   try {
     const organizations = await getAllOrganizations();
-    res.render('organizations', { title: 'Our Partner Organizations', organizations, errors: [] });
+    res.render('organizations', { 
+      title: 'Our Partner Organizations', 
+      organizations, 
+      errors: [] 
+    });
   } catch (error) {
     console.error('❌ Error fetching organizations:', error.message);
     req.flash("error", "Failed to load organizations.");
@@ -78,7 +94,11 @@ app.get('/organizations', async (req, res) => {
 app.get('/categories', async (req, res) => {
   try {
     const result = await db.query('SELECT * FROM categories ORDER BY category_id');
-    res.render('categories', { title: 'Categories', categories: result.rows, errors: [] });
+    res.render('categories', { 
+      title: 'Categories', 
+      categories: result.rows, 
+      errors: [] 
+    });
   } catch (error) {
     console.error('❌ Error fetching categories:', error.message);
     req.flash("error", "Failed to load categories.");
