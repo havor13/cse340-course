@@ -238,10 +238,22 @@ textarea {
     border-color: #bee5eb;
 }
 
-.nav ul {
-  list-style: none;
-  display: flex;
-  gap: 1rem;
+nav ul {
+  list-style: none;       /* remove bullets */
+  margin: 0;
+  padding: 0;
+  display: flex;          /* flexbox makes items horizontal */
+  justify-content: flex-start; /* align links to the left */
+}
+
+nav ul li {
+  margin-right: 20px;     /* spacing between links */
+}
+
+nav ul li a {
+  text-decoration: none;
+  color: #fff;            /* link color */
+  font-weight: bold;
 }
 
 .dropdown {
