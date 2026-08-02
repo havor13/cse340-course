@@ -2,14 +2,13 @@
 
 <main>
   <h1><%= title %></h1>
- 
-  <h1>Welcome, <%= name %> 👋</h1>
-  <p>You are logged in as <strong><%= role %></strong>.</p>
-  <p>Name: <%= name %></p>
-  <p>Email: <%= email %></p>
-  <p>Role: <%= role %></p>
 
-  <!-- Optional: Flash Messages -->
+  <!-- Personalized welcome -->
+  <h2>Welcome, <%= name %> 👋</h2>
+  <p>You are logged in as <strong><%= role %></strong>.</p>
+  <p>Email: <%= email %></p>
+
+  <!-- Flash Messages -->
   <% if (typeof messages !== 'undefined' && Object.keys(messages).length > 0) { %>
     <div class="flash-container">
       <% Object.keys(messages).forEach(type => { %>
@@ -26,6 +25,7 @@
       <a href="/users" class="btn btn-primary">👥 View All Users</a>
     </p>
   <% } %>
+
 </main>
 
 <%- include('partials/footer') %>

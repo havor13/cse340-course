@@ -139,5 +139,5 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log("🚀 Starting server...");
   console.log(`📡 Listening on http://127.0.0.1:${PORT}`);
-  console.log(`🌍 Environment: ${NODE_ENV}`);
+  console.log("🔧 DB_URL from .env:", process.env.DB_URL);
 });

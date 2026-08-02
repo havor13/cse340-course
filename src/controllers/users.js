@@ -60,10 +60,17 @@ const processLoginForm = async (req, res) => {
   }
 };
 
-// ✅ Handle logout logic
+// ✅ Handle logout logic (safe flash before destroy)
 const processLogout = (req, res) => {
-  req.session.destroy(() => {
-    req.flash('success', 'Logout successful!');
+  // Set flash message while session still exists
+  req.flash('success', 'Logout successful!');
+
+  // Then destroy session
+  req.session.destroy(err => {
+    if (err) {
+      console.error('Error destroying session:', err);
+      return res.status(500).render('500', { title: 'Server Error', errors: ['Logout failed'] });
+    }
     res.redirect('/login');
   });
 };
