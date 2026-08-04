@@ -40,7 +40,7 @@
       </p>
     <% } %>
 
-    <!-- Action buttons (admin-only) -->
+    <!-- Admin-only actions -->
     <% if (user && user.role_name === 'admin') { %>
       <p>
         <a href="/projects/edit-project/<%= project.project_id %>" class="btn-small">✏️ Edit</a>
@@ -52,6 +52,22 @@
       </form>
     <% } %>
   </section>
+
+  <!-- Volunteer actions -->
+  <% if (user) { %>
+    <% if (isVolunteer) { %>
+      <p>You are volunteering for this project.</p>
+      <form action="/projects/<%= project.project_id %>/unvolunteer" method="POST">
+        <button type="submit" class="btn btn-danger">Remove Volunteer</button>
+      </form>
+    <% } else { %>
+      <form action="/projects/<%= project.project_id %>/volunteer" method="POST">
+        <button type="submit" class="btn btn-success">Volunteer</button>
+      </form>
+    <% } %>
+  <% } else { %>
+    <p><a href="/login" class="btn btn-primary">Log in to volunteer</a></p>
+  <% } %>
 
   <!-- Back to list -->
   <p>

@@ -4,7 +4,8 @@ import { Pool } from "pg";
 
 // Load environment variables from .env file
 dotenv.config();
-console.log("🔧 DB_URL from .env:", process.env.DB_URL); // Debug log
+
+console.log("Loaded DB_URL:", process.env.DB_URL);
 
 /**
  * Connection pool for PostgreSQL database.

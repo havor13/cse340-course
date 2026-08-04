@@ -13,6 +13,8 @@ import organizationRoutes from "./src/routes/organizations.js";
 import registrationRoutes from "./src/routes.js"; // ✅ import registration & login routes
 import session from "express-session";
 import flash from "connect-flash"; // ✅ use connect-flash
+import volunteerRoutes from "./src/routes/volunteers.js";
+
 
 // Load environment variables
 dotenv.config();
@@ -70,6 +72,7 @@ app.use("/", categoryRoutes);
 app.use("/projects", projectRoutes);        
 app.use("/", organizationRoutes); 
 app.use("/", registrationRoutes); // ✅ mount registration & login routes
+app.use("/", volunteerRoutes); // ✅ mount volunteer routes
 
 // Home route
 app.get('/', (req, res) => res.render('home', { title: 'Home' }));
